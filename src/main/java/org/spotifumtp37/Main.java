@@ -1,6 +1,6 @@
-package org.example;
+package org.spotifumtp37;
 
-import org.example.model.album.Album;
+import org.spotifumtp37.model.album.Album;
 
 public class Main {
     public static void main(String[] args) {

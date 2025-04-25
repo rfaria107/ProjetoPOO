@@ -2,7 +2,7 @@ plugins {
     id("java")
 }
 
-group = "org.example"
+group = "org.spotifumtp37"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -16,4 +16,11 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.register<JavaExec>("run") {
+    group = "application"
+    description = "Run the application"
+    mainClass.set("org.spotifumtp37.Main")
+    classpath = sourceSets.main.get().runtimeClasspath
 }

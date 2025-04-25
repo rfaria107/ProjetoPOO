@@ -1,4 +1,4 @@
-package org.example.model.album;
+package org.spotifumtp37.model.album;
 
 import java.util.ArrayList;
 import java.util.List;

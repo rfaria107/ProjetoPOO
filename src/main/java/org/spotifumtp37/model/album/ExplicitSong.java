@@ -1,4 +1,4 @@
-package org.example.model.album;
+package org.spotifumtp37.model.album;
 
 public class ExplicitSong extends Song {
     ExplicitSong(Song other) {
