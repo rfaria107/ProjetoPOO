@@ -3,7 +3,7 @@ package org.spotifumtp37.model.user;
 import org.spotifumtp37.model.subscription.FreePlan;
 import org.spotifumtp37.model.subscription.SubscriptionPlan;
 
-public abstract class User {
+public class User {
     private final String name;
     private final String email;
     private final String address;
@@ -80,6 +80,9 @@ public abstract class User {
 
     public void setPontos(double pontos) {
         this.pontos = pontos;
+    }
+    public User clone() {
+        return new User(this);
     }
 }
 

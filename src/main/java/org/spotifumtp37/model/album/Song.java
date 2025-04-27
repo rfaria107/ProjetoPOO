@@ -58,4 +58,10 @@ public class Song {
         return durationInSeconds;
     }
 
+    public Song clone() {
+        return new Song(this);
+    }
+
+
+
 }
