@@ -1,5 +1,7 @@
 package org.spotifumtp37.model.album;
 
+import org.spotifumtp37.model.playlist.Playable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,12 +10,12 @@ import java.util.List;
  * The album includes details such as title, artist, release year, genre,
  * and provides functionality to manage the list of songs.
  */
-public class Album {
+public class Album implements Playable {
     private String title;
     private String artist;
     private int releaseYear;
     private String genre;
-    private final List<Song> songs;
+    private List<Song> songs;
 
     /**
      * Construtor parametrizado do álbum...
@@ -72,7 +74,7 @@ public class Album {
     }
 
 
-    public boolean removeMusic(String name) {
+    public boolean deleteSong(String name) {
         return songs.removeIf(song -> song.getName().equals(name));
     }
 

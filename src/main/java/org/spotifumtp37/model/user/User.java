@@ -78,5 +78,8 @@ public class User {
     public void setPontos(double pontos) {
         this.pontos = pontos;
     }
+    public User clone() {
+        return new User(this);
+    }
 }
 
