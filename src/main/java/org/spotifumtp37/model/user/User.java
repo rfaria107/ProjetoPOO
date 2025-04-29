@@ -3,16 +3,13 @@ package org.spotifumtp37.model.user;
 import org.spotifumtp37.model.subscription.FreePlan;
 import org.spotifumtp37.model.subscription.SubscriptionPlan;
 
-public abstract class User {
+public class User {
     private final String name;
     private final String email;
     private final String address;
     private SubscriptionPlan subscriptionplan;
     private final String password;
     private double pontos;
-    //teste commit
-    //  private String nome2;
-//}
 
     public User(String name, String email, String address, SubscriptionPlan subscriptionPlan, String password, double pontos) {
         this.name = name;
