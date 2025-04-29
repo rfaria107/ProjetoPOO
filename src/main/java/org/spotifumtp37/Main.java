@@ -1,22 +1,18 @@
 package org.spotifumtp37;
 
-import org.spotifumtp37.model.album.Album;
+import org.spotifumtp37.controller.MainController;
+import org.spotifumtp37.model.SpotifUMData;
+import org.spotifumtp37.view.MainMenuView;
 
 public class Main {
     public static void main(String[] args) {
-
-        //testes do album e musica
-        Album album = new Album("Jar Of Flies", "Alice In Chains", 1994, "Rock");
-
-        // Add Songs
-        album.addSong("Rotten Apple", "Sony", "what i see is unreal", "D,G,C", "Rock", 3658);
-        album.addSong("Nutshell", "Sony", "we chase misprinted lies", "C,D,A", "Rock", 2419);
-
-        // Print songs
-        System.out.println("Songs in Album " + album.getTitle() + " by " + album.getArtist() + ":");
-        album.getSongs().forEach(song -> System.out.println(song.getName()));
-
-        System.out.println("Total Album DUration: " + album.getTotalDuration() + " seconds");
-
+        // inicializar o model
+        SpotifUMData spotifUMData = new SpotifUMData();
+        // o controller
+        MainController controller = new MainController(spotifUMData);
+        // e a view
+        MainMenuView mainMenuView = new MainMenuView(controller);
+        //iniciar a execução
+        mainMenuView.run();
     }
 }

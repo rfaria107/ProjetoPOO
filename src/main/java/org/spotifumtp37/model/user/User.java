@@ -10,9 +10,6 @@ public class User {
     private SubscriptionPlan subscriptionplan;
     private final String password;
     private double pontos;
-    //teste commit
-    //  private String nome2;
-//}
 
     public User(String name, String email, String address, SubscriptionPlan subscriptionPlan, String password, double pontos) {
         this.name = name;
