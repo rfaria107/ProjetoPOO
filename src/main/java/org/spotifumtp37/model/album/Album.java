@@ -129,7 +129,6 @@ public class Album implements Playable {
         return genre;
     }
 
-    //nao deve ser necessario, so pra fazer uns testes
     public int getTotalDuration() {
         return songs.stream().mapToInt(Song::getDurationInSeconds).sum();
     }
@@ -145,6 +144,7 @@ public class Album implements Playable {
     public void next(User user) {
         if (user.getSubscriptionPlan().podeNavegarPlaylist()){
             currentSong = songs.get((songs.indexOf(currentSong)+1)%songs.size());
+            currentSong.incrementTimesPlayed();
         }
         else {
             Random rand = new Random();
@@ -153,25 +153,34 @@ public class Album implements Playable {
                 randomIndex = rand.nextInt(songs.size()-1);
             }
             currentSong = songs.get(randomIndex);
+            currentSong.incrementTimesPlayed();
         }
+        user.somarPontos();
     }
     @Override
     public void previous(User user) {
         if (user.getSubscriptionPlan().podeNavegarPlaylist()){
             currentSong = songs.get((songs.indexOf(currentSong)-1+songs.size()-1)%songs.size()-1);
+            currentSong.incrementTimesPlayed();
         }
         else {
             throw new UnsupportedOperationException("Your subscription does not allow going back in the playlist.");
         }
+        user.somarPontos();
     }
 
     @Override
-    public void play() {
-        return;
+    public Album clone() {
+        return new Album(this);
+    }
+    @Override
+    public void play(User user) {
+        this.currentSong.incrementTimesPlayed();
+        user.somarPontos();
     }
 
     @Override
-    public void pause() {
+    public void pauseMusic() {
         return;
     }
 }
