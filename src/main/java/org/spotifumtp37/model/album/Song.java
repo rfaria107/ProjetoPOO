@@ -1,5 +1,9 @@
 package org.spotifumtp37.model.album;
 
+import org.spotifumtp37.model.playlist.Playlist;
+
+import java.util.Objects;
+
 public class Song {
     private String name;
     private String artist;
@@ -8,6 +12,18 @@ public class Song {
     private String musicalNotes;
     private String genre;
     private int durationInSeconds;
+    private int timesPlayed;
+
+    Song(){
+        this.name = "";
+        this.artist = "";
+        this.publisher = "";
+        this.lyrics = "";
+        this.musicalNotes = "";
+        this.genre = "";
+        this.durationInSeconds = 0;
+        this.timesPlayed = 0;
+    }
 
     Song(String name, String artist, String publisher, String lyrics,
          String musicalNotes, String genre, int durationInSeconds) {
@@ -18,6 +34,7 @@ public class Song {
         this.musicalNotes = musicalNotes;
         this.genre = genre;
         this.durationInSeconds = durationInSeconds;
+        this.timesPlayed = 0;
     }
 
     Song(Song other) {
@@ -28,17 +45,9 @@ public class Song {
         this.musicalNotes = other.getMusicalNotes();
         this.genre = other.getGenre();
         this.durationInSeconds = other.getDurationInSeconds();
+        this.timesPlayed = other.getTimesPlayed();
     }
 
-    Song(){
-        this.name = "";
-        this.artist = "";
-        this.publisher = "";
-        this.lyrics = "";
-        this.musicalNotes = "";
-        this.genre = "";
-        this.durationInSeconds = 0;
-    }
 
     public String getName() {
         return name;
@@ -96,11 +105,27 @@ public class Song {
         this.durationInSeconds = durationInSeconds;
     }
 
-    @Override
-    public final boolean equals(Object o) {
-        if (!(o instanceof Song song)) return false;
+    public int getTimesPlayed() {
+        return timesPlayed;
+    }
 
-        return getDurationInSeconds() == song.getDurationInSeconds() && getName().equals(song.getName()) && getArtist().equals(song.getArtist());
+    public void setTimesPlayed(int timesPlayed) {
+        this.timesPlayed = timesPlayed;
+    }
+
+    public void incrementTimesPlayed() {
+        this.timesPlayed++;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {return true;}
+        if (obj == null || getClass() != obj.getClass()) {return false;}
+        Song other = (Song) obj;
+        return Objects.equals(name, other.name) && Objects.equals(artist, other.artist)
+                && Objects.equals(publisher, other.publisher) && durationInSeconds == other.durationInSeconds
+                && Objects.equals(lyrics, other.lyrics) && Objects.equals(musicalNotes, other.musicalNotes)
+                && Objects.equals(genre, other.genre) && Objects.equals(timesPlayed, other.timesPlayed);
     }
 
     @Override

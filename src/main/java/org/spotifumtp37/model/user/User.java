@@ -1,6 +1,8 @@
 package org.spotifumtp37.model.user;
 
 import org.spotifumtp37.model.subscription.FreePlan;
+import org.spotifumtp37.model.subscription.PremiumBase;
+import org.spotifumtp37.model.subscription.PremiumTop;
 import org.spotifumtp37.model.subscription.SubscriptionPlan;
 
 public class User {
@@ -70,16 +72,29 @@ public class User {
         }
     }
 
+    public void setPontos(double pontos) {
+        this.pontos = pontos;
+    }
+
     public void somarPontos() {
         double newPontos = subscriptionplan.adicionaPontos(pontos); // Get the new points from the plan
         setPontos(newPontos);
     }
-
-    public void setPontos(double pontos) {
-        this.pontos = pontos;
-    }
     public User clone() {
         return new User(this);
+    }
+
+    public void updatePremiumBase(PremiumBase newPlan) {
+        this.setSubscriptionPlan(newPlan);
+    }
+
+    public void updatePremiumTop(PremiumTop newPlan) {
+        this.setSubscriptionPlan(newPlan);
+        this.pontos +=100;
+    }
+
+    public void updateFreePlan(FreePlan newPlan) {
+        this.setSubscriptionPlan(newPlan);
     }
 }
 

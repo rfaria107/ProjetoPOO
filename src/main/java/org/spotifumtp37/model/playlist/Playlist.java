@@ -17,7 +17,7 @@ public class Playlist implements Playable{
     private List<Song> songs;
     private Song currentSong;
 
-    public Playlist(User creator, String playlistName, String playlistDescription, int numberOfFollowers, String status, List<Song> songs, Song currentSong) {
+    public Playlist(User creator, String playlistName, String playlistDescription, int numberOfFollowers, String status, List<Song> songs) {
         this.creator = creator.clone();
         this.playlistName = playlistName;
         this.playlistDescription = playlistDescription;
@@ -25,9 +25,11 @@ public class Playlist implements Playable{
         this.status = status;
         this.songs = new ArrayList<>();
         for(Song song: songs){
-            this.songs.add(song.clone());
+            this.songs.add(song);
         }
-        this.currentSong = currentSong.clone();
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(songs.size()-1);
+        this.currentSong = songs.get(randomIndex);
     }
 
     public Playlist (Playlist other){
@@ -38,14 +40,18 @@ public class Playlist implements Playable{
         this.status = other.status;
         this.songs = new ArrayList<>();
         for(Song song: other.songs){
-            this.songs.add(song.clone());
+            this.songs.add(song);
         }
-        this.currentSong = other.currentSong.clone();
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(songs.size()-1);
+        this.currentSong = songs.get(randomIndex);
     }
+
     @Override
     public Playlist clone() {
         return new Playlist(this);
     }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {return true;}
@@ -56,6 +62,7 @@ public class Playlist implements Playable{
                 && Objects.equals(status, other.status) && Objects.equals(songs, other.songs)
                 && Objects.equals(currentSong, other.currentSong);
     }
+
     @Override
     public String toString() {
         return "Playlist{" + "creator: {'" + creator + "} \'" + ", playlistName='" + playlistName + '\''
@@ -86,7 +93,7 @@ public class Playlist implements Playable{
     public List<Song> getSongs() {
         List<Song> copy = new ArrayList<>();
         for( Song song: songs){
-            copy.add(song.clone());
+            copy.add(song);
         }
         return copy;
     }
@@ -117,7 +124,7 @@ public class Playlist implements Playable{
 
     public void setSongs(List<Song> songs) {
         for (Song song : songs) {
-            this.songs.add(song.clone());
+            this.songs.add(song);
         }
     }
 
@@ -128,13 +135,14 @@ public class Playlist implements Playable{
     public boolean isPrivate (){
         return status.equalsIgnoreCase("private");
     }
+
     public boolean isPublic (){
         return status.equalsIgnoreCase("public");
     }
 
     @Override
-    public void next() {
-        if (creator.getSubscriptionPlan().podeNavegarPlaylist()){
+    public void next(User user) {
+        if (user.getSubscriptionPlan().podeNavegarPlaylist()){
             currentSong = songs.get((songs.indexOf(currentSong)+1)%songs.size());
         }
         else {
@@ -147,8 +155,8 @@ public class Playlist implements Playable{
         }
     }
     @Override
-    public void previous() {
-        if (creator.getSubscriptionPlan().podeNavegarPlaylist()){
+    public void previous(User user) {
+        if (user.getSubscriptionPlan().podeNavegarPlaylist()){
             currentSong = songs.get((songs.indexOf(currentSong)-1+songs.size()-1)%songs.size()-1);
         }
         else {
@@ -181,5 +189,15 @@ public class Playlist implements Playable{
         else {
             throw new UnsupportedOperationException("Your subscription does not allow deleting songs from the playlist.");
         }
+    }
+
+    @Override
+    public void play() {
+        return;
+    }
+
+    @Override
+    public void pause() {
+        return;
     }
 }
