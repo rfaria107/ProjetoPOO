@@ -1,9 +1,11 @@
 package org.spotifumtp37.model.album;
 
 import org.spotifumtp37.model.playlist.Playable;
+import org.spotifumtp37.model.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Represents a music album containing a collection of songs and associated metadata.
@@ -16,6 +18,17 @@ public class Album implements Playable {
     private int releaseYear;
     private String genre;
     private List<Song> songs;
+    private Song currentSong;
+
+
+    public Album() {
+        this.title = "";
+        this.artist = "";
+        this.releaseYear = 0;
+        this.genre = "";
+        this.songs = new ArrayList<>();
+        this.currentSong = new Song();
+    }
 
     /**
      * Construtor parametrizado do álbum...
@@ -32,14 +45,10 @@ public class Album implements Playable {
         this.releaseYear = releaseYear;
         this.genre = genre;
         this.songs = copySongs(songs);
-    }
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(songs.size()-1);
+        this.currentSong = songs.get(randomIndex);
 
-    public Album() {
-        this.title = "";
-        this.artist = "";
-        this.releaseYear = 0;
-        this.genre = "";
-        this.songs = new ArrayList<>();
     }
 
     public Album(Album other) {
@@ -48,7 +57,9 @@ public class Album implements Playable {
         this.releaseYear = other.getReleaseYear();
         this.genre = other.getGenre();
         this.songs = copySongs(other.getSongs());
-    }
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(songs.size()-1);
+        this.currentSong = songs.get(randomIndex);    }
 
     public List<Song> copySongs(List<Song> songs) {
         List<Song> copy = new ArrayList<>();
@@ -121,5 +132,46 @@ public class Album implements Playable {
     //nao deve ser necessario, so pra fazer uns testes
     public int getTotalDuration() {
         return songs.stream().mapToInt(Song::getDurationInSeconds).sum();
+    }
+    public Song getCurrentSong() {
+        return currentSong;
+    }
+
+    public void setCurrentSong(Song currentSong) {
+        this.currentSong = currentSong;
+    }
+
+    @Override
+    public void next(User user) {
+        if (user.getSubscriptionPlan().podeNavegarPlaylist()){
+            currentSong = songs.get((songs.indexOf(currentSong)+1)%songs.size());
+        }
+        else {
+            Random rand = new Random();
+            int randomIndex = rand.nextInt(songs.size()-1);
+            while (randomIndex == songs.indexOf(currentSong)){
+                randomIndex = rand.nextInt(songs.size()-1);
+            }
+            currentSong = songs.get(randomIndex);
+        }
+    }
+    @Override
+    public void previous(User user) {
+        if (user.getSubscriptionPlan().podeNavegarPlaylist()){
+            currentSong = songs.get((songs.indexOf(currentSong)-1+songs.size()-1)%songs.size()-1);
+        }
+        else {
+            throw new UnsupportedOperationException("Your subscription does not allow going back in the playlist.");
+        }
+    }
+
+    @Override
+    public void play() {
+        return;
+    }
+
+    @Override
+    public void pause() {
+        return;
     }
 }

@@ -1,8 +1,10 @@
 package org.spotifumtp37.model;
 
 import org.spotifumtp37.model.album.*;
+import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.user.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class SpotifUMData {
@@ -10,4 +12,12 @@ public class SpotifUMData {
     public Map<String, Album> albuns;
     public Map<String, User> users;
     public Map<String, Playlist> playlists;
+
+    // falta os play e pause, contar as views da musica
+
+    public SpotifUMData() {
+        this.albuns = new HashMap<>();
+        this.users = new HashMap<>();
+        this.playlists = new HashMap<>();
+    }
 }

@@ -1,10 +1,11 @@
 package org.spotifumtp37.model.playlist;
 
+import org.spotifumtp37.model.user.User;
+
 public interface Playable {
-    void next();
-    void previous();
+    void next(User user);
+    void previous(User user);
     void play();
     void pause();
-    void addSong();
-    void deleteSong();
+
 }
