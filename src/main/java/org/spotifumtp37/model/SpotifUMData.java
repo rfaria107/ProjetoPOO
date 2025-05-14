@@ -75,6 +75,10 @@ public class SpotifUMData {
         return mapUsers;
     }
 
+    public User getCurrentUserPointer(String username) {
+        return this.users.get(username);
+    }
+
     public Map<String, Playlist> getMapPlaylists() {
         Map<String, Playlist> mapPlaylists = new HashMap<>();
         for (Map.Entry<String, Playlist> entry : playlists.entrySet()) {
