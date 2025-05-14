@@ -200,6 +200,7 @@ public class Playlist implements Playable{
     public void play(User user) {
         this.currentSong.incrementTimesPlayed();
         user.somarPontos();
+        user.updateHistory(this.currentSong);
     }
 
     @Override
