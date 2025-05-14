@@ -16,6 +16,7 @@ public class TextUI {
     private final Scanner scanner;
     private final SpotifUMData modelData;
     private final JsonDataParser parser = new JsonDataParser();
+    private User loggedUser;
 
     public TextUI() {
         this.scanner = new Scanner(System.in);
@@ -199,8 +200,7 @@ public class TextUI {
                 "PremiumTop"
         });
 
-        // Only allow premium users to create playlists
-        // playlistMenu.setPreCondition(1, () -> currentUser.getSubscriptionPlan().podeCriarPlaylist());
+        changeSubscriptionMenu.setPreCondition(1, () -> currentUser.getSubscriptionPlan().podeCriarPlaylist());
 
         //playlistMenu.setHandler(1, this::createPlaylist);
         //playlistMenu.setHandler(2, this::viewPlaylists);
@@ -223,6 +223,7 @@ public class TextUI {
         boolean isAuthenticated = this.authenticateUser(username, password);
         if (isAuthenticated) {
             System.out.println("Login successful! Redirecting to User Menu...");
+            loggedUser = this.modelData.getCurrentUserPointer(username);
             showUserMenu(); // Show user menu
         } else {
             System.out.println("Invalid credentials for User!");
