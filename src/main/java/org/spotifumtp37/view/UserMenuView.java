@@ -1,4 +1,4 @@
-package org.spotifumtp37.view;
+/*package org.spotifumtp37.view;
 
 import org.spotifumtp37.controller.MainController;
 
@@ -21,3 +21,4 @@ public class UserMenuView {
     }
 
 }
+ */

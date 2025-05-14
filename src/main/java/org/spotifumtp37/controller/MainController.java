@@ -1,4 +1,4 @@
-package org.spotifumtp37.controller;
+/*package org.spotifumtp37.controller;
 
 import org.spotifumtp37.model.SpotifUMData;
 import org.spotifumtp37.model.album.Album;
@@ -62,3 +62,4 @@ public class MainController {
     }
 
 }
+ */

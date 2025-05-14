@@ -1,4 +1,4 @@
-package org.spotifumtp37.view;
+/*package org.spotifumtp37.view;
 
 import org.spotifumtp37.controller.MainController;
 import org.spotifumtp37.util.JsonDataParser;
@@ -61,3 +61,4 @@ public class AdminMenuView {
         }
     }
 }
+ */

@@ -173,6 +173,7 @@ public class Album implements Playable {
     public Album clone() {
         return new Album(this);
     }
+
     @Override
     public void play(User user) {
         this.currentSong.incrementTimesPlayed();
