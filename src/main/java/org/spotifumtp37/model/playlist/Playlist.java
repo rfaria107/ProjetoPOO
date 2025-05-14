@@ -18,7 +18,7 @@ public class Playlist implements Playable{
     private Song currentSong;
 
     public Playlist(User creator, String playlistName, String playlistDescription, int numberOfFollowers, String status, List<Song> songs) {
-        this.creator = creator.clone();
+        this.creator = creator;
         this.playlistName = playlistName;
         this.playlistDescription = playlistDescription;
         this.numberOfFollowers = numberOfFollowers;

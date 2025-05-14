@@ -140,4 +140,18 @@ public class Song {
     public Song clone(){
         return new Song(this);
     }
+
+    @Override
+    public String toString() {
+        return "Song{" +
+                "name='" + name + '\'' +
+                ", artist='" + artist + '\'' +
+                ", publisher='" + publisher + '\'' +
+                ", lyrics='" + lyrics + '\'' +
+                ", musicalNotes='" + musicalNotes + '\'' +
+                ", genre='" + genre + '\'' +
+                ", durationInSeconds=" + durationInSeconds +
+                ", timesPlayed=" + timesPlayed +
+                '}';
+    }
 }

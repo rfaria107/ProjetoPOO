@@ -184,4 +184,16 @@ public class Album implements Playable {
     public void pauseMusic() {
         return;
     }
+
+    @Override
+    public String toString() {
+        return "Album{" +
+                "title='" + title + '\'' +
+                ", artist='" + artist + '\'' +
+                ", releaseYear=" + releaseYear +
+                ", genre='" + genre + '\'' +
+                ", songs=" + songs +
+                ", currentSong=" + currentSong +
+                '}';
+    }
 }

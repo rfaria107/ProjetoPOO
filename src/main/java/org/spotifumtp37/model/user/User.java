@@ -136,5 +136,18 @@ public class User {
         h.setTime(time);
         this.history.add(h);
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", subscriptionplan=" + subscriptionplan +
+                ", password='" + password + '\'' +
+                ", pontos=" + pontos +
+                ", history=" + history +
+                '}';
+    }
 }
 
