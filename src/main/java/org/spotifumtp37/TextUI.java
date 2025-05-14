@@ -1,15 +1,22 @@
 package org.spotifumtp37;
 
 import org.spotifumtp37.model.SpotifUMData;
+import org.spotifumtp37.model.album.Song;
 import org.spotifumtp37.model.exceptions.JaExisteException;
 import org.spotifumtp37.model.exceptions.NaoExisteException;
+import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.subscription.FreePlan;
+import org.spotifumtp37.model.subscription.PremiumBase;
+import org.spotifumtp37.model.subscription.PremiumTop;
+import org.spotifumtp37.model.subscription.SubscriptionPlan;
 import org.spotifumtp37.model.user.User;
 import org.spotifumtp37.util.JsonDataParser;
 
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 public class TextUI {
@@ -24,7 +31,7 @@ public class TextUI {
     }
 
     public void run() {
-            this.showMainMenu();
+        this.showMainMenu();
     }
 
     //menus do programa
@@ -182,10 +189,9 @@ public class TextUI {
                 "Delete Playlist"
         });
 
-        // Only allow premium users to create playlists
-        // playlistMenu.setPreCondition(1, () -> currentUser.getSubscriptionPlan().podeCriarPlaylist());
+        userPlaylistMenu.setPreCondition(1, () -> this.loggedUser.getSubscriptionPlan().podeCriarPlaylist());
 
-        //playlistMenu.setHandler(1, this::createPlaylist);
+        userPlaylistMenu.setHandler(1, () -> criaPlaylistUser());
         //playlistMenu.setHandler(2, this::viewPlaylists);
         //playlistMenu.setHandler(3, this::addSongToPlaylist);
         //playlistMenu.setHandler(4, this::removeSongFromPlaylist);
@@ -200,12 +206,21 @@ public class TextUI {
                 "PremiumTop"
         });
 
-        changeSubscriptionMenu.setPreCondition(1, () -> currentUser.getSubscriptionPlan().podeCriarPlaylist());
+        changeSubscriptionMenu.setPreCondition(1, () -> !this.loggedUser
+                .getSubscriptionPlan()
+                .equals(new FreePlan()));
 
-        //playlistMenu.setHandler(1, this::createPlaylist);
-        //playlistMenu.setHandler(2, this::viewPlaylists);
-        //playlistMenu.setHandler(3, this::addSongToPlaylist);
-        //playlistMenu.setHandler(4, this::removeSongFromPlaylist);
+        changeSubscriptionMenu.setPreCondition(1, () -> !this.loggedUser
+                .getSubscriptionPlan()
+                .equals(new PremiumBase()));
+
+        changeSubscriptionMenu.setPreCondition(1, () -> !this.loggedUser
+                .getSubscriptionPlan()
+                .equals(new PremiumTop()));
+
+        changeSubscriptionMenu.setHandler(1, () -> alteraSubscriptionFreePlan());
+        changeSubscriptionMenu.setHandler(2, () -> alteraSubscriptionPremiumBasePlan());
+        changeSubscriptionMenu.setHandler(3, () -> alteraSubscriptionPremiumTopPlan());
 
         changeSubscriptionMenu.run();
     }
@@ -355,6 +370,75 @@ public class TextUI {
 
     private void printCurrentData() {
         System.out.println(modelData.toString());
+    }
+
+    private void alteraSubscriptionFreePlan() {
+        FreePlan freePlan = new FreePlan();
+        this.loggedUser.setSubscriptionPlan(freePlan);
+    }
+
+    private void alteraSubscriptionPremiumBasePlan() {
+        PremiumBase premiumBase = new PremiumBase();
+        this.loggedUser.setSubscriptionPlan(premiumBase);
+    }
+
+    private void alteraSubscriptionPremiumTopPlan() {
+        PremiumTop premiumTop = new PremiumTop();
+        this.loggedUser.updatePremiumTop(premiumTop);
+    }
+
+    private void criaPlaylistUser() {
+
+        List<Song> musicas = new ArrayList<>();
+        System.out.println("Digite o nome da playlist: ");
+        String nomePlaylist = scanner.nextLine();
+        System.out.println("Indique descrição da playlist: ");
+        String descricaoPlaylist = scanner.nextLine();
+        String estado;
+        do {
+            System.out.println("Estado (private ou public):");
+            estado = scanner.nextLine().trim();
+            if (!estado.equalsIgnoreCase("private")
+                    && !estado.equalsIgnoreCase("public")) {
+                System.out.println("Opção inválida! Digite apenas 'private' ou 'public'.");
+            }
+        } while (!estado.equalsIgnoreCase("Privado")
+                && !estado.equalsIgnoreCase("Público"));
+        System.out.println("Indique número inicial de músicas: ");
+        int n = scanner.nextInt();
+        while (n > 0) {
+            while (true) {
+                System.out.println("Indique o nome do albúm da música:");
+                String nomeAlbum = scanner.nextLine();
+                try {
+                    System.out.println(this.modelData.getAlbum(nomeAlbum));
+                    break;
+                } catch (NaoExisteException e) {
+                    System.out.println("Nome incorreto, não existe");
+                }
+                while (true) {
+                    System.out.println("Escolha a musica que deseja adicionar á playlist:");
+                    String nomeMusica = scanner.nextLine();
+                    try {
+                        musicas.add(this.modelData.getSong(nomeMusica, nomeAlbum));
+                        break;
+                    } catch (NaoExisteException e) {
+                        System.out.println("Nome incorreto, nao existe");
+                    }
+                }
+            }
+            n--;
+        }
+        Playlist playlist = new Playlist(loggedUser, nomePlaylist, descricaoPlaylist,0, estado, musicas);
+        while ( true){
+            try{
+                this.modelData.adicionaPlaylist(playlist);
+                break;
+            }
+            catch (JaExisteException e){
+                System.out.println(" Já existe uma playlist com esse nome! Tente novamente.");
+            }
+        }
     }
 
 }
