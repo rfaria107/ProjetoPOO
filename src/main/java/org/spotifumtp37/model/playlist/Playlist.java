@@ -33,7 +33,7 @@ public class Playlist implements Playable{
     }
 
     public Playlist (Playlist other){
-        this.creator = other.creator.clone();
+        this.creator = other.creator;
         this.playlistName = other.playlistName;
         this.playlistDescription = other.playlistDescription;
         this.numberOfFollowers = other.numberOfFollowers;
