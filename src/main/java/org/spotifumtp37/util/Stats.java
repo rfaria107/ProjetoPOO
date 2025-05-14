@@ -4,6 +4,8 @@ import org.spotifumtp37.model.album.Album;
 import org.spotifumtp37.model.album.Song;
 import org.spotifumtp37.model.SpotifUMData;
 
+import org.spotifumtp37.model.playlist.Playlist;
+import org.spotifumtp37.model.user.History;
 import org.spotifumtp37.model.user.User;
 
 
@@ -48,6 +50,85 @@ public class Stats {
 
             if (userHistorySize > maxHistorySize) {
                 maxHistorySize = userHistorySize;
+                topUser = u;
+            }
+        }
+
+        return topUser;
+    }
+    public static User getUserWithMostPoints(List<User> users) {
+        User topUser = null;
+        double maxPoints = -Double.MAX_VALUE;
+
+        for (User u : users) {
+            double userPoints = u.getPontos();
+
+            // Adiciona os pontos de acordo com o plano de subscrição
+            if (u.getSubscriptionPlan() instanceof FreePlan) {
+                userPoints = u.getSubscriptionPlan().adicionaPontos(userPoints);  // Adiciona pontos para FreePlan
+            } else if (u.getSubscriptionPlan() instanceof PremiumBase) {
+                userPoints = u.getSubscriptionPlan().adicionaPontos(userPoints);  // Adiciona pontos para PremiumBase
+            } else if (u.getSubscriptionPlan() instanceof PremiumTop) {
+                userPoints = u.getSubscriptionPlan().adicionaPontos(userPoints);  // Adiciona pontos para PremiumTop
+            }
+
+
+            if (userPoints > maxPoints) {
+                maxPoints = userPoints;
+                topUser = u;
+            }
+        }
+
+        return topUser;  // Retorna o utilizador com mais pontos
+    }
+
+    Map<String, Integer> generoContador = new HashMap<>();
+
+    public static String generoMaisReproduzido(List<History> historico) {
+        Map<String, Integer> contadorGeneros = new HashMap<>();
+
+        for (History h : historico) {
+            Song s = h.getSong();
+            String genero = s.getGenre();
+
+            contadorGeneros.put(genero, contadorGeneros.getOrDefault(genero, 0) + 1);
+        }
+
+        // Encontrar o género com maior número de reproduções
+        String generoMaisReproduzido = null;
+        int max = 0;
+
+        for (Map.Entry<String, Integer> entry : contadorGeneros.entrySet()) {
+            if (entry.getValue() > max) {
+                max = entry.getValue();
+                generoMaisReproduzido = entry.getKey();
+            }
+        }
+
+        return generoMaisReproduzido;
+    }
+
+    public static int contarPlaylistsPublicas(List<Playlist> playlists) {
+        int contador = 0;
+
+        for (Playlist p : playlists) {
+            if (p.isPublic()) {
+                contador++;
+            }
+        }
+
+        return contador;
+    }
+
+    public static User utilizadorComMaisPlaylists(List<User> users) {
+        User topUser = null;
+        int max = 0;
+
+        for (User u : users) {
+            int numPlaylists = u.getPlaylists().size ();
+
+            if (numPlaylists > max) {
+                max = numPlaylists;
                 topUser = u;
             }
         }
