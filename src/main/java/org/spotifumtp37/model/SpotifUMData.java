@@ -85,26 +85,26 @@ public class SpotifUMData {
 
     public void setMapAlbums(Map<String, Album> mapAlbums) {
         Map<String, Album> newMapCarros = new HashMap<>();
-        for (Map.Entry<String, Album> entry : albuns.entrySet()) {
+        for (Map.Entry<String, Album> entry : mapAlbums.entrySet()) {
             newMapCarros.put(entry.getKey(), entry.getValue().clone());
         }
-        albuns = newMapCarros;
+        this.albuns = newMapCarros;
     }
 
     public void setMapUsers(Map<String, User> mapUsers) {
         Map<String, User> newMapUsers = new HashMap<>();
-        for (Map.Entry<String, User> entry : users.entrySet()) {
+        for (Map.Entry<String, User> entry : mapUsers.entrySet()) {
             newMapUsers.put(entry.getKey(), entry.getValue().clone());
         }
-        users = newMapUsers;
+        this.users = newMapUsers;
     }
 
     public void setMapPlaylists(Map<String, Playlist> mapPlaylists) {
         Map<String, Playlist> newMapPlaylists = new HashMap<>();
-        for (Map.Entry<String, Playlist> entry : playlists.entrySet()) {
+        for (Map.Entry<String, Playlist> entry : mapPlaylists.entrySet()) {
             newMapPlaylists.put(entry.getKey(), entry.getValue().clone());
         }
-        playlists = newMapPlaylists;
+        this.playlists = newMapPlaylists;
     }
 
     public boolean existeAlbum(String title) {

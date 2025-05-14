@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("application") // Add application plugin
 }
 
 group = "org.spotifumtp37"
@@ -10,18 +11,20 @@ repositories {
 }
 
 dependencies {
-    implementation ("com.google.code.gson:gson:2.13.1")
+    implementation("com.google.code.gson:gson:2.13.1")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+}
+
+application {
+    mainClass.set("org.spotifumtp37.Main")
 }
 
 tasks.test {
     useJUnitPlatform()
 }
 
-tasks.register<JavaExec>("run") {
-    group = "application"
-    description = "Run the application"
-    mainClass.set("org.spotifumtp37.Main")
-    classpath = sourceSets.main.get().runtimeClasspath
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
+    jvmArgs = listOf("-Dfile.encoding=UTF-8")
 }

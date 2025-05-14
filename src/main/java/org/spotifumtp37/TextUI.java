@@ -9,6 +9,7 @@ import org.spotifumtp37.util.JsonDataParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class TextUI {
@@ -52,8 +53,9 @@ public class TextUI {
 
         adminMenu.setHandler(1, this::showAlbumManagementMenu);
         adminMenu.setHandler(2, this::showUserManagementMenu);
-        adminMenu.setHandler(3, this::showDataMenu);
-        adminMenu.setHandler(4, this::showStatisticsMenu);
+        adminMenu.setHandler(3, this::showPlaylistManagementMenu);
+        adminMenu.setHandler(4, this::showDataMenu);
+        adminMenu.setHandler(5, this::showStatisticsMenu);
 
         adminMenu.run();
     }
@@ -90,16 +92,32 @@ public class TextUI {
         userMenu.run();
     }
 
+    private void showPlaylistManagementMenu() {
+        NewMenu playlistMenu = new NewMenu(new String[]{
+                "Delete Playlist",
+        });
+
+        // Implement handlers here
+        playlistMenu.run();
+    }
+
     private void showDataMenu() {
         NewMenu dataMenu = new NewMenu(new String[]{
                 "Import Data from JSON",
                 "Export Data to JSON",
                 "Backup System Data",
                 "Restore from Backup",
-                "Clear System Data"
+                "Clear System Data",
+                "DEBUG PRINT DATA"
         });
 
-        // Implement handlers here
+        dataMenu.setHandler(1, this::loadData);
+        dataMenu.setHandler(2, this::saveData);
+        dataMenu.setHandler(3, this::backupData);
+        dataMenu.setHandler(4, this::restoreData); // Optional
+        dataMenu.setHandler(5, this::clearSystemData);
+        dataMenu.setHandler(6, this::printCurrentData);
+
         dataMenu.run();
     }
 
@@ -134,6 +152,24 @@ public class TextUI {
     }
 
     //submenus do user
+
+    private void showMusicSelectionMenu() {
+        NewMenu musicSelectionMenu = new NewMenu(new String[]{
+                "Play from playlist",
+                "Play from album"
+        });
+
+        // Only allow premium users to create playlists
+        // playlistMenu.setPreCondition(1, () -> currentUser.getSubscriptionPlan().podeCriarPlaylist());
+
+        //playlistMenu.setHandler(1, this::createPlaylist);
+        //playlistMenu.setHandler(2, this::viewPlaylists);
+        //playlistMenu.setHandler(3, this::addSongToPlaylist);
+        //playlistMenu.setHandler(4, this::removeSongFromPlaylist);
+
+        musicSelectionMenu.run();
+    }
+
     private void showUserPlaylistManagementMenu() {
         NewMenu userPlaylistMenu = new NewMenu(new String[]{
                 "Create User Playlist",
@@ -154,23 +190,6 @@ public class TextUI {
         //playlistMenu.setHandler(4, this::removeSongFromPlaylist);
 
         userPlaylistMenu.run();
-    }
-
-    private void showMusicSelectionMenu() {
-        NewMenu musicSelectionMenu = new NewMenu(new String[]{
-                "Play from playlist",
-                "Play from album"
-        });
-
-        // Only allow premium users to create playlists
-        // playlistMenu.setPreCondition(1, () -> currentUser.getSubscriptionPlan().podeCriarPlaylist());
-
-        //playlistMenu.setHandler(1, this::createPlaylist);
-        //playlistMenu.setHandler(2, this::viewPlaylists);
-        //playlistMenu.setHandler(3, this::addSongToPlaylist);
-        //playlistMenu.setHandler(4, this::removeSongFromPlaylist);
-
-        musicSelectionMenu.run();
     }
 
     private void showChangeSubscriptionMenu() {
@@ -294,6 +313,34 @@ public class TextUI {
         }
     }
 
+    private void backupData() {
+        try {
+            parser.createBackup(modelData);
+            System.out.println("Backup created in /data/ with timestamp.");
+        } catch (IOException e) {
+            System.out.println("Backup failed: " + e.getMessage());
+        }
+    }
+
+    private void restoreData() {
+        System.out.print("Enter backup folder path to restore from: ");
+        String path = scanner.nextLine();
+        try {
+            this.loadFromJson(path);
+            System.out.println("System restored from backup.");
+        } catch (IOException e) {
+            System.out.println("Could not restore: " + e.getMessage());
+        }
+    }
+
+    private void clearSystemData() {
+        modelData.setMapAlbums(new HashMap<>());
+        modelData.setMapUsers(new HashMap<>());
+        modelData.setMapPlaylists(new HashMap<>());
+        System.out.println(" SpotifUMData has been cleared.");
+    }
+
+
     public void loadFromJson(String filePath) throws IOException {
         SpotifUMData loaded = parser.fromJsonData(filePath);
         modelData.setMapAlbums(loaded.getMapAlbums());
@@ -304,4 +351,9 @@ public class TextUI {
     public void saveToJson(String filePath) throws IOException {
         parser.toJsonData(modelData, filePath);
     }
+
+    private void printCurrentData() {
+        System.out.println(modelData.toString());
+    }
+
 }
