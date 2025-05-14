@@ -115,6 +115,19 @@ public class SpotifUMData {
         return albuns.containsKey(title);
     }
 
+    public boolean existeMusica(String title, String albumTitle) {
+        if (existeAlbum(albumTitle)) {
+            Album album = albuns.get(albumTitle);
+            for (Song song : album.getSongs()) {
+                if (song.getName().equals(title)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        else return false;
+    }
+
     public boolean existePlaylist(String playlistName) {
         return playlists.containsKey(playlistName);
     }
@@ -142,6 +155,21 @@ public class SpotifUMData {
         else {
             return albuns.get(title).clone();
         }
+    }
+
+    public Song getSong(String title, String albumTitle) throws NaoExisteException {
+        if (!existeMusica(title, albumTitle)) {
+            throw new NaoExisteException(title);
+        }
+        else {
+            Album album = albuns.get(albumTitle);
+            for (Song song : album.getSongs()) {
+                if (song.getName().equals(title)) {
+                    return song.clone();
+                }
+            }
+        }
+        return null;
     }
 
     public Playlist getPlaylist(String playlistName) throws NaoExisteException {
