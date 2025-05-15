@@ -220,17 +220,24 @@ public class UserUI {
         String nomePlaylist;
         Playlist playlist;
         System.out.println("Digite o nome da playlist: ");
-
+        scanner.nextLine();
         nomePlaylist = scanner.nextLine().trim();
         while (!this.modelData.existePlaylist(nomePlaylist)) {
             System.out.println("A playlist não existe. Digite outro nome: ");
             nomePlaylist = scanner.nextLine().trim();
         }
         try {
-            playlist = this.modelData.getPlaylist(nomePlaylist);}
+            playlist = this.modelData.getAnyPlaylist(nomePlaylist,loggedUser);}
         catch (NaoExisteException e) {
             System.out.println("Incorrect name, does not exist");
             return;
+        }
+
+        // Before attempting to add a song, check if the user's subscription allows it
+        if (!loggedUser.getSubscriptionPlan().canCreatePlaylist()) {
+            System.out.println("Your current subscription plan doesn't allow adding songs to playlists.");
+            System.out.println("Please upgrade your subscription to access this feature.");
+            return; // Exit the method early
         }
         while (true) {
             System.out.println("Indique o nome do albúm da música a adicionar:");
@@ -249,7 +256,6 @@ public class UserUI {
                             System.out.println("Song already in playlist, try again");
                             nomeMusica = scanner.nextLine().trim();
                             added = this.modelData.getSong(nomeMusica, nomeAlbum);
-
                         }
                         playlist.addSong(added);
                         System.out.println("Song added to playlist");

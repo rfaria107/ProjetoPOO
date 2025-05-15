@@ -76,7 +76,7 @@ public class Playlist implements Serializable, Playable {
     }
 
     public User getCreator() {
-        return creator.clone();
+        return creator;
     }
 
     public String getPlaylistName() {
@@ -108,7 +108,7 @@ public class Playlist implements Serializable, Playable {
     }
 
     public void setCreatorUsername(User creator) {
-        this.creator = creator.clone();
+        this.creator = creator;
     }
 
     public void setPlaylistName(String playlistName) {
@@ -188,7 +188,7 @@ public class Playlist implements Serializable, Playable {
     public void deleteSong(Song song) {
         if (creator.getSubscriptionPlan().canCreatePlaylist()) {
             if (songs.contains(song)) {
-                songs.remove(song.clone());
+                songs.remove(song);
             } else {
                 throw new UnsupportedOperationException("This song is not in the playlist.");
             }

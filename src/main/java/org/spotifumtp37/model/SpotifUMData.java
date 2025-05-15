@@ -179,6 +179,14 @@ public class SpotifUMData implements Serializable {
         }
     }
 
+    public Playlist getAnyPlaylist(String playlistName,User creator) throws NaoExisteException {
+        if (existePlaylist(playlistName) && this.getPlaylistMapByCreator(creator).containsKey(playlistName)) {
+            return playlists.get(playlistName);
+        } else {
+            throw new NaoExisteException(playlistName);
+        }
+    }
+
     public User getUser(String username) throws NaoExisteException {
         if (!existeUser(username)) {
             throw new NaoExisteException(username);
