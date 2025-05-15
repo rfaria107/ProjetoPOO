@@ -109,16 +109,12 @@ public class User implements Serializable {
     }
 
     public void somarPontos() {
-        double newPontos = subscriptionplan.adicionaPontos(pontos); // Get the new points from the plan
+        double newPontos = subscriptionplan.addPoints(pontos); // Get the new points from the plan
         setPontos(newPontos);
     }
 
     public User clone() {
         return new User(this);
-    }
-
-    public void updatePremiumBase(PremiumBase newPlan) {
-        this.setSubscriptionPlan(newPlan);
     }
 
     public void updatePremiumTop(PremiumTop newPlan) {

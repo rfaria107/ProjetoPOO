@@ -1,13 +1,13 @@
 package org.spotifumtp37;
 
 
-import org.spotifumtp37.delegate.TextUI;
+import org.spotifumtp37.delegate.SpotifUMUI;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("\nWelcome to SpotifUM!");
 
-        TextUI spotifum = new TextUI();
-        spotifum.run();
+        SpotifUMUI application = new SpotifUMUI();
+        application.run();
     }
 }
