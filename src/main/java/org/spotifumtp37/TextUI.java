@@ -1,6 +1,7 @@
 package org.spotifumtp37;
 
 import org.spotifumtp37.model.SpotifUMData;
+import org.spotifumtp37.model.album.Album;
 import org.spotifumtp37.model.album.Song;
 import org.spotifumtp37.model.exceptions.JaExisteException;
 import org.spotifumtp37.model.exceptions.NaoExisteException;
@@ -411,7 +412,10 @@ public class TextUI {
                 System.out.println("Indique o nome do albúm da música:");
                 String nomeAlbum = scanner.nextLine().trim();
                 try {
-                    System.out.println(this.modelData.getAlbum(nomeAlbum));
+                    Album album = this.modelData.getAlbum(nomeAlbum);
+                    for (Song song : album.getSongs()) {
+                        System.out.println( song);
+                    }
                     break;
                 } catch (NaoExisteException e) {
                     System.out.println("Nome incorreto, não existe");
