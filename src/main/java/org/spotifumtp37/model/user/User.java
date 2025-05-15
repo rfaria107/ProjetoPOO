@@ -30,7 +30,7 @@ public class User implements Serializable {
         this.subscriptionplan = subscriptionPlan;
         this.password = password;
         this.pontos = pontos;
-        this.history = new ArrayList<>(history);
+        this.history = new ArrayList<>();
         for (History h : history) {
             this.history.add(h.clone());
         }
@@ -46,7 +46,7 @@ public class User implements Serializable {
         this.password = other.getPassword();
         this.pontos = other.getPontos();
         this.history = new ArrayList<>();
-        for (History h : history) {
+        for (History h : other.history) {
             this.history.add(h.clone());
         }
     }
@@ -86,8 +86,8 @@ public class User implements Serializable {
     }
 
     public List<History> getHistory() {
-        List<History> copy = new ArrayList<>(history);
-        for (History h : history) {
+        List<History> copy = new ArrayList<>();
+        for (History h : this.history) {
             copy.add(h.clone());
         }
         return copy;
@@ -150,7 +150,7 @@ public class User implements Serializable {
     public void updateHistory(Song song) {
         History h = new History();
         LocalDateTime time = LocalDateTime.now();
-        h.setSong(song);
+        h.setSong(song.clone());
         h.setTime(time);
         this.history.add(h);
     }

@@ -11,12 +11,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SpotifUMData implements Serializable {
-    //basicamente a facade do model? tem todos os dados e é a esta que o controller deve aceder
     private Map<String, Album> albums;
     private Map<String, User> users;
     private Map<String, Playlist> playlists;
-
-    // falta os play e pause, contar as views da musica
 
     public SpotifUMData() {
         this.albums = new HashMap<>();
@@ -120,7 +117,7 @@ public class SpotifUMData implements Serializable {
     public boolean existeMusica(String title, String albumTitle) {
         if (existeAlbum(albumTitle)) {
             Album album = albums.get(albumTitle);
-            for (Song song : album.getSongs()) {
+            for (Song song : album.getSongsCopy()) {
                 if (song.getName().equals(title)) {
                     return true;
                 }
@@ -153,7 +150,7 @@ public class SpotifUMData implements Serializable {
         if (!existeAlbum(title)) {
             throw new NaoExisteException(title);
         } else {
-            return albums.get(title).clone();
+            return albums.get(title);
         }
     }
 
@@ -162,7 +159,7 @@ public class SpotifUMData implements Serializable {
             throw new NaoExisteException(title);
         } else {
             Album album = albums.get(albumTitle);
-            for (Song song : album.getSongs()) {
+            for (Song song : album.getSongsCopy()) {
                 if (song.getName().equals(title)) {
                     return song;
                 }
@@ -234,6 +231,15 @@ public class SpotifUMData implements Serializable {
             throw new NaoExisteException(playlistName);
         }
     }
+
+    public void removeUser(String username) throws NaoExisteException {
+        if (users.containsKey(username)) {
+            users.remove(username);
+        } else {
+            throw new NaoExisteException(username);
+        }
+    }
+
     public Map<String, Playlist> getPlaylistMapByCreator(User creator) {
         return playlists.entrySet().stream()
                 .filter(e -> e.getValue().getCreator().equals(creator))
@@ -243,6 +249,33 @@ public class SpotifUMData implements Serializable {
                 ));
     }
 
+    /**
+     * Directly increments the play count for a song in all albums by name and artist
+     * @param songName Name of the song to update
+     * @param artistName Artist of the song to update
+     * @return true if at least one song was updated
+     */
+    public boolean incrementSongPlayCount(String songName, String artistName) {
+        boolean updated = false;
+
+        // Update in albums
+        for (Album album : this.albums.values()) {
+            for (Song song : album.getSongs()) {
+                if (song.getName().equals(songName) && song.getArtist().equals(artistName)) {
+                    song.incrementTimesPlayed();
+                    updated = true;
+                    // For debugging
+                    System.out.println("[DEBUG] Incremented song '" + songName +
+                            "' by '" + artistName +
+                            "' in album '" + album.getTitle() +
+                            "'. New count: " + song.getTimesPlayed());
+                }
+            }
+        }
+
+        return updated;
+    }
+
+
+
 }
-
-

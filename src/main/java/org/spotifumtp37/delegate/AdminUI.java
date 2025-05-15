@@ -8,18 +8,16 @@ import org.spotifumtp37.model.exceptions.NaoExisteException;
 import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.user.User;
 import org.spotifumtp37.util.JsonDataParser;
+import org.spotifumtp37.util.Stats;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class AdminUI {
     private final JsonDataParser parser;
     private final Scanner scanner;
-    private SpotifUMData modelData;
+    private final SpotifUMData modelData;
 
     public AdminUI(SpotifUMData modelData, Scanner scanner) {
         this.modelData = modelData;
@@ -27,12 +25,11 @@ public class AdminUI {
         this.parser = new JsonDataParser();
     }
 
-
     public void showAdminMenu() {
         NewMenu adminMenu = new NewMenu(new String[]{
                 "Manage Albums",
                 "Manage Users",
-                "Manage Playlist",
+                "Manage Playlists",
                 "Manage Data",
                 "View System Stats / Execute Queries"
         });
@@ -51,12 +48,13 @@ public class AdminUI {
         NewMenu albumMenu = new NewMenu(new String[]{
                 "Add New Album",
                 "Delete Album",
-                "View All Albums"//todo
+                "View All Albums"
         });
 
 
         albumMenu.setHandler(1, this::createAlbum);
         albumMenu.setHandler(2, this::deleteAlbum);
+        albumMenu.setHandler(3, this::viewAllAlbums);
 
         albumMenu.run();
     }
@@ -68,7 +66,8 @@ public class AdminUI {
         });
 
 
-        //userManagementMenu.setHandler(1, this::signUpAsUser);
+        userManagementMenu.setHandler(1, this::deleteUser);
+        userManagementMenu.setHandler(2, this::viewAllUsers);
 
         userManagementMenu.run();
     }
@@ -77,11 +76,12 @@ public class AdminUI {
         NewMenu playlistManagementMenu = new NewMenu(new String[]{
                 "Create Playlist",
                 "Delete Playlist",
-                "View All Playlists",//todo
+                "View All Playlists"
         });
 
         playlistManagementMenu.setHandler(1, this::createPlaylistAdmin);
         playlistManagementMenu.setHandler(2, this::deletePlaylistAdmin);
+        playlistManagementMenu.setHandler(3, this::viewAllPlaylists);
 
         playlistManagementMenu.run();
     }
@@ -108,12 +108,86 @@ public class AdminUI {
 
     public void showStatisticsMenu() {
         NewMenu statsMenu = new NewMenu(new String[]{
-                "View Most Popular Albums",//todo
-                "View Most Active Users",//todo
-                "View Subscription Statistics"//todo
+                "Get Most Played Song",
+                "Get Most Listened Artist",
+                "Get Top Listener (Most Songs Listened)",
+                "Get User With Most Points",
+                "Get Most Played Genre",
+                "Count Public Playlists",
+                "Get User Who Created Most Playlists"
         });
 
-        // Implement handlers here
+        // Handler for "Get Most Played Song"
+        statsMenu.setHandler(1, () -> {
+            Song song = Stats.getMostPlayedSong(modelData.getMapAlbums());
+            if (song != null) {
+                System.out.println("Most Played Song: " + song.getName() + " by " + song.getArtist() +
+                        " (Played " + song.getTimesPlayed() + " times)");
+            } else {
+                System.out.println("No song data available or no songs played.");
+            }
+        });
+
+        // Handler for "Get Most Listened Artist"
+        statsMenu.setHandler(2, () -> {
+            String artist = Stats.getMostListenedArtist(modelData.getMapAlbums());
+            if (artist != null) {
+                System.out.println("Most Listened Artist: " + artist);
+            } else {
+                System.out.println("No artist data available or no songs played.");
+            }
+        });
+
+        // Handler for "Get Top Listener"
+        statsMenu.setHandler(3, () -> {
+            User user = Stats.getTopListener(modelData.getMapUsers());
+            if (user != null) {
+                System.out.println("Top Listener (Most Songs Listened): " + user.getName() +
+                        " (Listening History Size: " + user.getHistory().size() + ")");
+            } else {
+                System.out.println("No user data available.");
+            }
+        });
+
+        // Handler for "Get User With Most Points"
+        statsMenu.setHandler(4, () -> {
+            User user = Stats.getUserWithMostPoints(modelData.getMapUsers());
+            if (user != null) {
+                System.out.println("User With Most Points: " + user.getName() +
+                        " (Points: " + user.getPontos() + ")");
+            } else {
+                System.out.println("No user data available for points calculation.");
+            }
+        });
+
+        // Handler for "Get Most Played Genre"
+        statsMenu.setHandler(5, () -> {
+            String genre = Stats.generoMaisReproduzido(modelData.getMapUsers());
+            if (genre != null) {
+                System.out.println("Most Played Genre: " + genre);
+            } else {
+                System.out.println("No genre data available from user histories.");
+            }
+        });
+
+        // Handler for "Count Public Playlists"
+        statsMenu.setHandler(6, () -> {
+            // Assuming modelData has getPlaylists() returning Map<String, Playlist>
+            long count = Stats.contarPlaylistsPublicas(modelData.getMapPlaylists());
+            System.out.println("Number of Public Playlists: " + count);
+        });
+
+        // Handler for "Get User Who Created Most Playlists"
+        statsMenu.setHandler(7, () -> {
+            // Assuming modelData has getPlaylists() returning Map<String, Playlist>
+            User user = Stats.utilizadorComMaisPlaylists(modelData.getMapPlaylists());
+            if (user != null) {
+                System.out.println("User Who Created Most Playlists: " + user.getName());
+            } else {
+                System.out.println("No playlist data available or no creators found.");
+            }
+        });
+
         statsMenu.run();
     }
 
@@ -232,7 +306,7 @@ public class AdminUI {
 
         Album album = new Album(titulo, artista, ano, genero, new ArrayList<>());
 
-        int nFaixas = 0;
+        int nFaixas;
         do {
             System.out.print("Quantas faixas deseja adicionar? ");
             try {
@@ -263,7 +337,7 @@ public class AdminUI {
             System.out.print("Género musical da faixa: ");
             String generoMusica = scanner.nextLine().trim();
 
-            int duracao = 0;
+            int duracao;
             do {
                 System.out.print("Duração (segundos): ");
                 try {
@@ -284,7 +358,6 @@ public class AdminUI {
             this.modelData.adicionaAlbum(album);
             System.out.println("Álbum criado com sucesso!");
         } catch (JaExisteException e) {
-            // não deve acontecer pois checamos no início, mas só por precaução:
             System.out.println("Erro: álbum já existe. Tente novamente com outro título.");
         }
     }
@@ -314,14 +387,13 @@ public class AdminUI {
             modelData.removeAlbum(titulo);
             System.out.println("Album deleted successfully.");
         } catch (NaoExisteException e) {
-            // nao deve acontecer pois já checkamos, mas...
             System.out.println("Error album not found.");
         }
     }
 
     public void createPlaylistAdmin() {
         System.out.println("Admin: Create Playlist");
-        scanner.nextLine();
+        scanner.nextLine(); 
 
         User playlistOwner = null;
         System.out.print("Enter username of the playlist owner (leave blank for a general/system playlist): ");
@@ -368,7 +440,7 @@ public class AdminUI {
 
     public void deletePlaylistAdmin() {
         System.out.println("Admin: Delete Playlist");
-        scanner.nextLine();
+        scanner.nextLine(); 
         System.out.print("Enter the name of the playlist to delete: ");
         String nome = scanner.nextLine().trim();
 
@@ -377,21 +449,103 @@ public class AdminUI {
             return;
         }
 
-        System.out.printf("Are you sure you want to delete the playlist '%s'? (s/n): ", nome);
+        System.out.printf("Are you sure you want to delete the playlist '%s'? (y/n): ", nome);
         String confirma = scanner.nextLine().trim();
-        if (!confirma.equalsIgnoreCase("s")) {
+        if (!confirma.equalsIgnoreCase("y")) {
             System.out.println("Operation cancelled.");
             return;
         }
 
         try {
-            modelData.removePlaylist(nome); // Admin can remove any playlist
+            modelData.removePlaylist(nome); 
             System.out.println("Playlist '" + nome + "' deleted successfully!");
         } catch (NaoExisteException e) {
-            // This case should ideally be caught by existePlaylist check above,
-            // but good for robustness.
             System.out.println("Error: Playlist not found during deletion attempt.");
         }
     }
 
+    public void viewAllAlbums() {
+        System.out.println("\n--- All Albums ---");
+        Map<String, Album> albums = modelData.getMapAlbums();
+
+        if (albums.isEmpty()) {
+            System.out.println("No albums found in the system.");
+            return;
+        }
+
+        for (Album album : albums.values()) {
+            System.out.println(album.toString()); 
+            System.out.println("----------------------------------------"); 
+        }
+        System.out.println(albums.size() + " album(s) listed.");
+    }
+
+    public void viewAllPlaylists() {
+        System.out.println("\n--- All Playlists ---");
+        Map<String, Playlist> playlists = modelData.getMapPlaylists();
+
+        if (playlists.isEmpty()) {
+            System.out.println("No playlists found in the system.");
+            return;
+        }
+
+        for (Playlist playlist : playlists.values()) {
+            System.out.println(playlist.toString());
+            System.out.println("----------------------------------------"); 
+        }
+        System.out.println(playlists.size() + " playlist(s) listed.");
+
+    }
+
+    public void viewAllUsers() {
+        System.out.println("\n--- All Users ---");
+        Map<String, User> users = modelData.getMapUsers();
+
+        if (users.isEmpty()) {
+            System.out.println("No users found in the system.");
+            System.out.println("\nPress Enter to return to the User Management Menu...");
+            scanner.nextLine();
+            return;
+        }
+
+        for (User user : users.values()) {
+            // Assuming User class has a meaningful toString() method
+            System.out.println(user.toString()); 
+            System.out.println("----------------------------------------"); 
+        }
+        System.out.println(users.size() + " user(s) listed.");
+    }
+
+    public void deleteUser() {
+        System.out.println("Admin: Delete User");
+        // scanner.nextLine(); // Consume any leftover newline from previous input if necessary
+        System.out.print("Enter the username of the user to delete: ");
+        String username = scanner.nextLine().trim();
+
+        while (!modelData.existeUser(username)) {
+            System.out.print("User not found. Enter another username (or 'exit' to cancel): ");
+            username = scanner.nextLine().trim();
+            if (username.equalsIgnoreCase("exit")) {
+                System.out.println("Operation canceled.");
+                return;
+            }
+        }
+
+        System.out.printf("Are you sure you want to delete the user '%s'? This action cannot be undone. (y/n): ", username);
+        String confirma = scanner.nextLine().trim();
+        if (!confirma.equalsIgnoreCase("y")) {
+            System.out.println("Operation Cancelled.");
+            return;
+        }
+
+        try {
+            modelData.removeUser(username);
+            System.out.println("User '" + username + "' deleted successfully.");
+            //  Future consideration: also delete playlists created by this user? Or reassign them?
+            //  For now, playlists will remain but might be orphaned if they were user-specific and private.
+        } catch (NaoExisteException e) {
+            // This should not happen due to the check above, but as a safeguard:
+            System.out.println("Error: User not found during deletion attempt.");
+        }
+    }
 }

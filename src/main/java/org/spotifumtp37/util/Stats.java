@@ -22,7 +22,7 @@ public class Stats {
             return null;
         }
         return albums.values().stream()
-                .flatMap(album -> album.getSongs().stream())
+                .flatMap(album -> album.getSongsCopy().stream())
                 .max(Comparator.comparingInt(Song::getTimesPlayed))
                 .orElse(null);
     }
@@ -40,7 +40,7 @@ public class Stats {
         Map<String, Integer> playCountByArtist = new HashMap<>();
 
         for (Album album : albums.values()) {
-            for (Song song : album.getSongs()) {
+            for (Song song : album.getSongsCopy()) {
                 String artist = song.getArtist();
                 playCountByArtist.put(artist, playCountByArtist.getOrDefault(artist, 0) + song.getTimesPlayed());
             }

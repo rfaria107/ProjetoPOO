@@ -57,7 +57,7 @@ public class Album implements Playable, Serializable {
         this.artist = other.getArtist();
         this.releaseYear = other.getReleaseYear();
         this.genre = other.getGenre();
-        this.songs = copySongs(other.getSongs());
+        this.songs = copySongs(other.getSongsCopy());
         Random rand = new Random();
         int randomIndex = rand.nextInt(songs.size() - 1);
         this.currentSong = songs.get(randomIndex);
@@ -91,12 +91,17 @@ public class Album implements Playable, Serializable {
         return songs.removeIf(song -> song.getName().equals(name));
     }
 
-    public List<Song> getSongs() {
+    public List<Song> getSongsCopy() {
         List<Song> copy = new ArrayList<>();
         for (Song song : this.songs) {
             copy.add(new Song(song));
         }
         return copy;
+    }
+
+    public List<Song> getSongs() {
+        // Return a new list that contains references to the original songs, not copies
+        return new ArrayList<>(this.songs);
     }
 
     public String getTitle() {
@@ -147,7 +152,6 @@ public class Album implements Playable, Serializable {
     public void next(User user) {
         if (user.getSubscriptionPlan().canBrowsePlaylist()) {
             currentSong = songs.get((songs.indexOf(currentSong) + 1) % songs.size());
-            currentSong.incrementTimesPlayed();
         } else {
             Random rand = new Random();
             int randomIndex = rand.nextInt(songs.size() - 1);
@@ -155,36 +159,28 @@ public class Album implements Playable, Serializable {
                 randomIndex = rand.nextInt(songs.size() - 1);
             }
             currentSong = songs.get(randomIndex);
-            currentSong.incrementTimesPlayed();
         }
-        user.somarPontos();
     }
 
     @Override
     public void previous(User user) {
         if (user.getSubscriptionPlan().canBrowsePlaylist()) {
             currentSong = songs.get((songs.indexOf(currentSong) - 1 + songs.size() - 1) % songs.size() - 1);
-            currentSong.incrementTimesPlayed();
         } else {
             throw new UnsupportedOperationException("Your subscription does not allow going back in the playlist.");
         }
-        user.somarPontos();
-    }
-
-    @Override
-    public Album clone() {
-        return new Album(this);
     }
 
     @Override
     public void play(User user) {
         this.currentSong.incrementTimesPlayed();
         user.somarPontos();
+        user.updateHistory(this.currentSong);
     }
 
     @Override
-    public void pauseMusic() {
-        return;
+    public Album clone() {
+        return new Album(this);
     }
 
     @Override

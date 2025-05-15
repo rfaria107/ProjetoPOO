@@ -104,7 +104,7 @@ public class Playlist implements Serializable, Playable {
     }
 
     public Song getCurrentSong() {
-        return currentSong.clone();
+        return currentSong;
     }
 
     public void setCreatorUsername(User creator) {
@@ -146,10 +146,16 @@ public class Playlist implements Serializable, Playable {
     }
 
     @Override
+    public void play(User user) {
+        this.currentSong.incrementTimesPlayed();
+        user.somarPontos();
+        user.updateHistory(this.currentSong);
+    }
+
+    @Override
     public void next(User user) {
         if (user.getSubscriptionPlan().canBrowsePlaylist()) {
             currentSong = songs.get((songs.indexOf(currentSong) + 1) % songs.size());
-            currentSong.incrementTimesPlayed();
         } else {
             Random rand = new Random();
             int randomIndex = rand.nextInt(songs.size() - 1);
@@ -157,20 +163,25 @@ public class Playlist implements Serializable, Playable {
                 randomIndex = rand.nextInt(songs.size() - 1);
             }
             currentSong = songs.get(randomIndex);
-            currentSong.incrementTimesPlayed();
         }
-        user.somarPontos();
+    }
+
+    public void nextShuffle() {
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(songs.size() - 1);
+        while (randomIndex == songs.indexOf(currentSong)) {
+            randomIndex = rand.nextInt(songs.size() - 1);
+        }
+        currentSong = songs.get(randomIndex);
     }
 
     @Override
     public void previous(User user) {
         if (user.getSubscriptionPlan().canBrowsePlaylist()) {
             currentSong = songs.get((songs.indexOf(currentSong) - 1 + songs.size() - 1) % songs.size() - 1);
-            currentSong.incrementTimesPlayed();
         } else {
             throw new UnsupportedOperationException("Your subscription does not allow going back in the playlist.");
         }
-        user.somarPontos();
     }
 
     public void addSong(Song song) {
@@ -195,17 +206,5 @@ public class Playlist implements Serializable, Playable {
         } else {
             throw new UnsupportedOperationException("Your subscription does not allow deleting songs from the playlist.");
         }
-    }
-
-    @Override
-    public void play(User user) {
-        this.currentSong.incrementTimesPlayed();
-        user.somarPontos();
-        user.updateHistory(this.currentSong);
-    }
-
-    @Override
-    public void pauseMusic() {
-        return;
     }
 }
