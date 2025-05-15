@@ -417,6 +417,7 @@ public class TextUI {
         List<Song> musicas = new ArrayList<>();
         System.out.println("Digite o nome da playlist: ");
         String nomePlaylist = scanner.nextLine().trim();
+        if (!this.modelData.existePlaylist(nomePlaylist)) {
         System.out.println("Indique descrição da playlist: ");
         String descricaoPlaylist = scanner.nextLine().trim();
         String estado;
@@ -457,21 +458,19 @@ public class TextUI {
                     break;
 
                 } catch (NaoExisteException e) {
-                    System.out.println("Nome incorreto, não existe");
+                    System.out.println("Incorrect name, does not exist");
                 }
             }
             n--;
         }
-
         Playlist playlist = new Playlist(loggedUser, nomePlaylist, descricaoPlaylist, 0, estado, musicas);
-        while (true) {
             try {
                 this.modelData.adicionaPlaylist(playlist);
-                break;
+                System.out.println("Playlist created successfully!");
             } catch (JaExisteException e) {
-                System.out.println(" Já existe uma playlist com esse nome! Tente novamente.");
+                System.out.println(" There is already a playlist with that name. Try again with a different name.");
             }
-        }
         System.out.println("Playlist created successfully!");
+        }
     }
 }
