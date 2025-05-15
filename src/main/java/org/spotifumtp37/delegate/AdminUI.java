@@ -281,6 +281,7 @@ public class AdminUI {
         }
 
         try {
+            album.setCurrentSong();
             this.modelData.adicionaAlbum(album);
             System.out.println("Álbum criado com sucesso!");
         } catch (JaExisteException e) {
