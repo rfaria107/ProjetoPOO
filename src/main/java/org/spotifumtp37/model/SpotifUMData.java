@@ -6,26 +6,28 @@ import org.spotifumtp37.model.exceptions.NaoExisteException;
 import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.user.*;
 
+import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class SpotifUMData {
+public class SpotifUMData implements Serializable {
     //basicamente a facade do model? tem todos os dados e é a esta que o controller deve aceder
-    private Map<String, Album> albuns;
+    private Map<String, Album> albums;
     private Map<String, User> users;
     private Map<String, Playlist> playlists;
 
     // falta os play e pause, contar as views da musica
 
     public SpotifUMData() {
-        this.albuns = new HashMap<>();
+        this.albums = new HashMap<>();
         this.users = new HashMap<>();
         this.playlists = new HashMap<>();
     }
 
     public SpotifUMData(SpotifUMData outro) {
-        this.albuns = new HashMap<>();
-        for (Map.Entry<String, Album> entry : outro.albuns.entrySet()) {
-            this.albuns.put(entry.getKey(), entry.getValue().clone());
+        this.albums = new HashMap<>();
+        for (Map.Entry<String, Album> entry : outro.albums.entrySet()) {
+            this.albums.put(entry.getKey(), entry.getValue().clone());
         }
         this.users = new HashMap<>();
         for (Map.Entry<String, User> entry : outro.users.entrySet()) {
@@ -44,7 +46,7 @@ public class SpotifUMData {
 
     @Override
     public String toString() {
-        return "Albuns: " + albuns.toString()
+        return "Albuns: " + albums.toString()
                 + "\nUsers: " + users.toString()
                 + "\nPlaylists: " + playlists.toString();
     }
@@ -54,14 +56,14 @@ public class SpotifUMData {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SpotifUMData that = (SpotifUMData) o;
-        return Objects.equals(albuns, that.albuns)
+        return Objects.equals(albums, that.albums)
                 && Objects.equals(users, that.users)
                 && Objects.equals(playlists, that.playlists);
     }
 
     public Map<String, Album> getMapAlbums() {
         Map<String, Album> mapCarros = new HashMap<>();
-        for (Map.Entry<String, Album> entry : albuns.entrySet()) {
+        for (Map.Entry<String, Album> entry : albums.entrySet()) {
             mapCarros.put(entry.getKey(), entry.getValue().clone());
         }
         return mapCarros;
@@ -75,6 +77,10 @@ public class SpotifUMData {
         return mapUsers;
     }
 
+    public User getCurrentUserPointer(String username) {
+        return this.users.get(username);
+    }
+
     public Map<String, Playlist> getMapPlaylists() {
         Map<String, Playlist> mapPlaylists = new HashMap<>();
         for (Map.Entry<String, Playlist> entry : playlists.entrySet()) {
@@ -85,30 +91,42 @@ public class SpotifUMData {
 
     public void setMapAlbums(Map<String, Album> mapAlbums) {
         Map<String, Album> newMapCarros = new HashMap<>();
-        for (Map.Entry<String, Album> entry : albuns.entrySet()) {
+        for (Map.Entry<String, Album> entry : mapAlbums.entrySet()) {
             newMapCarros.put(entry.getKey(), entry.getValue().clone());
         }
-        albuns = newMapCarros;
+        this.albums = newMapCarros;
     }
 
     public void setMapUsers(Map<String, User> mapUsers) {
         Map<String, User> newMapUsers = new HashMap<>();
-        for (Map.Entry<String, User> entry : users.entrySet()) {
+        for (Map.Entry<String, User> entry : mapUsers.entrySet()) {
             newMapUsers.put(entry.getKey(), entry.getValue().clone());
         }
-        users = newMapUsers;
+        this.users = newMapUsers;
     }
 
     public void setMapPlaylists(Map<String, Playlist> mapPlaylists) {
         Map<String, Playlist> newMapPlaylists = new HashMap<>();
-        for (Map.Entry<String, Playlist> entry : playlists.entrySet()) {
+        for (Map.Entry<String, Playlist> entry : mapPlaylists.entrySet()) {
             newMapPlaylists.put(entry.getKey(), entry.getValue().clone());
         }
-        playlists = newMapPlaylists;
+        this.playlists = newMapPlaylists;
     }
 
     public boolean existeAlbum(String title) {
-        return albuns.containsKey(title);
+        return albums.containsKey(title);
+    }
+
+    public boolean existeMusica(String title, String albumTitle) {
+        if (existeAlbum(albumTitle)) {
+            Album album = albums.get(albumTitle);
+            for (Song song : album.getSongs()) {
+                if (song.getName().equals(title)) {
+                    return true;
+                }
+            }
+            return false;
+        } else return false;
     }
 
     public boolean existePlaylist(String playlistName) {
@@ -120,7 +138,7 @@ public class SpotifUMData {
     }
 
     public int quantosAlbums() {
-        return albuns.size();
+        return albums.size();
     }
 
     public int quantosPlaylists() {
@@ -134,56 +152,89 @@ public class SpotifUMData {
     public Album getAlbum(String title) throws NaoExisteException {
         if (!existeAlbum(title)) {
             throw new NaoExisteException(title);
+        } else {
+            return albums.get(title).clone();
         }
-        else {
-            return albuns.get(title).clone();
+    }
+
+    public Song getSong(String title, String albumTitle) throws NaoExisteException {
+        if (!existeMusica(title, albumTitle)) {
+            throw new NaoExisteException(title);
+        } else {
+            Album album = albums.get(albumTitle);
+            for (Song song : album.getSongs()) {
+                if (song.getName().equals(title)) {
+                    return song;
+                }
+            }
         }
+        return null;
     }
 
     public Playlist getPlaylist(String playlistName) throws NaoExisteException {
         if (!existePlaylist(playlistName) || playlists.get(playlistName).isPrivate()) {
             throw new NaoExisteException(playlistName);
-        }
-        else {
-            return playlists.get(playlistName).clone();
+        } else {
+            return playlists.get(playlistName);
         }
     }
 
     public User getUser(String username) throws NaoExisteException {
         if (!existeUser(username)) {
             throw new NaoExisteException(username);
-        }
-        else {
+        } else {
             return users.get(username).clone();
         }
     }
 
     public void adicionaAlbum(Album album) throws JaExisteException {
-        if (!albuns.containsKey(album.getTitle())) {
-            albuns.put(album.getTitle(), album.clone());
-        }
-        else {
+        if (!albums.containsKey(album.getTitle())) {
+            albums.put(album.getTitle(), album.clone());
+        } else {
             throw new JaExisteException(album.getTitle());
         }
     }
 
-    public void adicionaPlaylist(Playlist playlist) throws JaExisteException {
+    public void addPlaylist(Playlist playlist) throws JaExisteException {
         if (!playlists.containsKey(playlist.getPlaylistName())) {
             playlists.put(playlist.getPlaylistName(), playlist.clone());
-        }
-        else {
+        } else {
             throw new JaExisteException(playlist.getPlaylistName());
         }
     }
 
-    public void adicionaUser (User user) throws JaExisteException {
+    public void adicionaUser(User user) throws JaExisteException {
         if (!users.containsKey(user.getName())) {
             users.put(user.getName(), user.clone());
-        }
-        else {
+        } else {
             throw new JaExisteException(user.getName());
         }
     }
+
+    public void removeAlbum(String title) throws NaoExisteException {
+        if (albums.containsKey(title)) {
+            albums.remove(title);
+        } else {
+            throw new NaoExisteException(title);
+        }
+    }
+
+    public void removePlaylist(String playlistName) throws NaoExisteException {
+        if (playlists.containsKey(playlistName)) {
+            playlists.remove(playlistName);
+        } else {
+            throw new NaoExisteException(playlistName);
+        }
+    }
+    public Map<String, Playlist> getPlaylistMapByCreator(User creator) {
+        return playlists.entrySet().stream()
+                .filter(e -> e.getValue().getCreator().equals(creator))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ));
+    }
+
 }
 
 

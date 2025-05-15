@@ -1,24 +1,26 @@
 package org.spotifumtp37.model.subscription;
 
-public class FreePlan implements SubscriptionPlan {
+import java.io.Serializable;
+
+public class FreePlan implements SubscriptionPlan, Serializable {
 
     @Override
-    public double adicionaPontos(double pontos) {
-        return 5 + pontos;
+    public double addPoints(double points) {
+        return 5 + points;
     }
 
     @Override
-    public boolean podeCriarPlaylist() {
+    public boolean canCreatePlaylist() {
         return false;
     }
 
     @Override
-    public boolean podeNavegarPlaylist() {
+    public boolean canBrowsePlaylist() {
         return false;
     }
 
     @Override
-    public boolean podeAcessarPlaylistsGeradasAutomaticamente() {
+    public boolean canAcessFavouritesList() {
         return false;
     }
 }

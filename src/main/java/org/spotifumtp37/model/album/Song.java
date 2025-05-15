@@ -2,9 +2,10 @@ package org.spotifumtp37.model.album;
 
 import org.spotifumtp37.model.playlist.Playlist;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Song {
+public class Song implements Serializable {
     private String name;
     private String artist;
     private String publisher;
@@ -14,7 +15,7 @@ public class Song {
     private int durationInSeconds;
     private int timesPlayed;
 
-    Song(){
+    Song() {
         this.name = "";
         this.artist = "";
         this.publisher = "";
@@ -119,8 +120,12 @@ public class Song {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {return true;}
-        if (obj == null || getClass() != obj.getClass()) {return false;}
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         Song other = (Song) obj;
         return Objects.equals(name, other.name) && Objects.equals(artist, other.artist)
                 && Objects.equals(publisher, other.publisher) && durationInSeconds == other.durationInSeconds
@@ -137,7 +142,21 @@ public class Song {
     }
 
     @Override
-    public Song clone(){
+    public Song clone() {
         return new Song(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Song{" +
+                "name='" + name + '\'' +
+                ", artist='" + artist + '\'' +
+                ", publisher='" + publisher + '\'' +
+                ", lyrics='" + lyrics + '\'' +
+                ", musicalNotes='" + musicalNotes + '\'' +
+                ", genre='" + genre + '\'' +
+                ", durationInSeconds=" + durationInSeconds +
+                ", timesPlayed=" + timesPlayed +
+                '}';
     }
 }

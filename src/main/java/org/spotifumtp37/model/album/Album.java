@@ -3,6 +3,7 @@ package org.spotifumtp37.model.album;
 import org.spotifumtp37.model.playlist.Playable;
 import org.spotifumtp37.model.user.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,7 +13,7 @@ import java.util.Random;
  * The album includes details such as title, artist, release year, genre,
  * and provides functionality to manage the list of songs.
  */
-public class Album implements Playable {
+public class Album implements Playable, Serializable {
     private String title;
     private String artist;
     private int releaseYear;
@@ -46,7 +47,7 @@ public class Album implements Playable {
         this.genre = genre;
         this.songs = copySongs(songs);
         Random rand = new Random();
-        int randomIndex = rand.nextInt(songs.size()-1);
+        int randomIndex = rand.nextInt(songs.size() - 1);
         this.currentSong = songs.get(randomIndex);
 
     }
@@ -58,8 +59,9 @@ public class Album implements Playable {
         this.genre = other.getGenre();
         this.songs = copySongs(other.getSongs());
         Random rand = new Random();
-        int randomIndex = rand.nextInt(songs.size()-1);
-        this.currentSong = songs.get(randomIndex);    }
+        int randomIndex = rand.nextInt(songs.size() - 1);
+        this.currentSong = songs.get(randomIndex);
+    }
 
     public List<Song> copySongs(List<Song> songs) {
         List<Song> copy = new ArrayList<>();
@@ -132,6 +134,7 @@ public class Album implements Playable {
     public int getTotalDuration() {
         return songs.stream().mapToInt(Song::getDurationInSeconds).sum();
     }
+
     public Song getCurrentSong() {
         return currentSong;
     }
@@ -142,28 +145,27 @@ public class Album implements Playable {
 
     @Override
     public void next(User user) {
-        if (user.getSubscriptionPlan().podeNavegarPlaylist()){
-            currentSong = songs.get((songs.indexOf(currentSong)+1)%songs.size());
+        if (user.getSubscriptionPlan().canBrowsePlaylist()) {
+            currentSong = songs.get((songs.indexOf(currentSong) + 1) % songs.size());
             currentSong.incrementTimesPlayed();
-        }
-        else {
+        } else {
             Random rand = new Random();
-            int randomIndex = rand.nextInt(songs.size()-1);
-            while (randomIndex == songs.indexOf(currentSong)){
-                randomIndex = rand.nextInt(songs.size()-1);
+            int randomIndex = rand.nextInt(songs.size() - 1);
+            while (randomIndex == songs.indexOf(currentSong)) {
+                randomIndex = rand.nextInt(songs.size() - 1);
             }
             currentSong = songs.get(randomIndex);
             currentSong.incrementTimesPlayed();
         }
         user.somarPontos();
     }
+
     @Override
     public void previous(User user) {
-        if (user.getSubscriptionPlan().podeNavegarPlaylist()){
-            currentSong = songs.get((songs.indexOf(currentSong)-1+songs.size()-1)%songs.size()-1);
+        if (user.getSubscriptionPlan().canBrowsePlaylist()) {
+            currentSong = songs.get((songs.indexOf(currentSong) - 1 + songs.size() - 1) % songs.size() - 1);
             currentSong.incrementTimesPlayed();
-        }
-        else {
+        } else {
             throw new UnsupportedOperationException("Your subscription does not allow going back in the playlist.");
         }
         user.somarPontos();
@@ -173,6 +175,7 @@ public class Album implements Playable {
     public Album clone() {
         return new Album(this);
     }
+
     @Override
     public void play(User user) {
         this.currentSong.incrementTimesPlayed();
@@ -182,5 +185,17 @@ public class Album implements Playable {
     @Override
     public void pauseMusic() {
         return;
+    }
+
+    @Override
+    public String toString() {
+        return "Album{" +
+                "title='" + title + '\'' +
+                ", artist='" + artist + '\'' +
+                ", releaseYear=" + releaseYear +
+                ", genre='" + genre + '\'' +
+                ", songs=" + songs +
+                ", currentSong=" + currentSong +
+                '}';
     }
 }

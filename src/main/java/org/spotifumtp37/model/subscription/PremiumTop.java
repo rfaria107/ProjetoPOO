@@ -1,20 +1,25 @@
 package org.spotifumtp37.model.subscription;
 
-public class PremiumTop implements SubscriptionPlan {
+import java.io.Serializable;
+
+public class PremiumTop implements Serializable, SubscriptionPlan {
     @Override
-    public double adicionaPontos(double pontos) {
-        return 1.025* pontos;
+    public double addPoints(double points) {
+        return 1.025 * points;
     }
+
     @Override
-    public boolean podeCriarPlaylist() {
+    public boolean canCreatePlaylist() {
         return true;
     }
+
     @Override
-    public boolean podeNavegarPlaylist() {
+    public boolean canBrowsePlaylist() {
         return true;
     }
+
     @Override
-    public boolean podeAcessarPlaylistsGeradasAutomaticamente() {
+    public boolean canAcessFavouritesList() {
         return true;
     }
 }

@@ -1,6 +1,8 @@
 package org.spotifumtp37.model.album;
 
-public class ExplicitSong extends Song {
+import java.io.Serializable;
+
+public class ExplicitSong extends Song implements Serializable {
     ExplicitSong(Song other) {
         super(other);
     }
