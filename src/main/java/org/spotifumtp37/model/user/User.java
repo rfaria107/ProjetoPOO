@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Serializable {
-    private final String name;
-    private final String email;
-    private final String address;
+    private String name;
+    private String email;
+    private String address;
     private SubscriptionPlan subscriptionplan;
-    private final String password;
+    private String password;
     private double pontos;
     private List<History> history;
 
@@ -106,6 +106,22 @@ public class User implements Serializable {
         for (History h : history) {
             this.history.add(h.clone());
         }
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void somarPontos() {

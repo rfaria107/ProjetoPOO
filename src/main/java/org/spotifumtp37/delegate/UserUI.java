@@ -113,11 +113,9 @@ public class UserUI {
         });
 
 
-        //playlistMenu.setHandler(1, this::createPlaylist);
-        //playlistMenu.setHandler(2, this::viewPlaylists);
-        //playlistMenu.setHandler(3, this::addSongToPlaylist);
-        //playlistMenu.setHandler(4, this::removeSongFromPlaylist);
-
+        userEditMenu.setHandler(1, this::changePassword);
+        userEditMenu.setHandler(2, this::changeEmail);
+        userEditMenu.setHandler(3, this::changeAdress);
         userEditMenu.run();
     }
 
@@ -248,7 +246,14 @@ public class UserUI {
                     System.out.println("Escolha a musica que deseja adicionar á playlist:");
                     String nomeMusica = scanner.nextLine().trim();
                     try {
-                        playlist.addSong(this.modelData.getSong(nomeMusica, nomeAlbum));
+                        Song added = this.modelData.getSong(nomeMusica, nomeAlbum);
+                        while( playlist.getSongs().contains( added ) ) {
+                            System.out.println("Song already in playlist, try again");
+                            nomeMusica = scanner.nextLine().trim();
+                            added = this.modelData.getSong(nomeMusica, nomeAlbum);
+
+                        }
+                        playlist.addSong(added);
                         System.out.println("Song added to playlist");
                         break;
                     } catch (NaoExisteException e) {
@@ -294,4 +299,95 @@ public class UserUI {
             System.out.println("Error: Playlist not found.");
         }
     }
-}
+
+    public void changePassword() {
+
+        // Assume 'loggedUserPassword' holds the current password for the logged‐in user
+        String loggedUserPassword = this.loggedUser.getPassword();
+
+        String currentPassword;
+        while (true) {
+            System.out.print("Enter your current password: ");
+            currentPassword = scanner.nextLine().trim();
+            if (currentPassword.equals(loggedUserPassword)) {
+                break;  // correct, exit loop
+            }
+            System.out.println("Incorrect password. Please try again.");
+        }
+
+        String newPassword;
+        while (true) {
+            System.out.print("Enter your new password: ");
+            newPassword = scanner.nextLine().trim();
+
+            System.out.print("Confirm your new password: ");
+            String confirmPassword = scanner.nextLine().trim();
+
+            if (!newPassword.equals(confirmPassword)) {
+                System.out.println("Passwords do not match. Please try again.");
+                continue;  // ask again
+            }
+
+            if (newPassword.isEmpty()) {
+                System.out.println("New password cannot be empty. Please try again.");
+                continue;
+            }
+
+            break;  // everything valid, exit loop
+        }
+
+        this.loggedUser.setPassword(newPassword);
+        System.out.println("Your password has been successfully changed.");
+    }
+
+    public void changeEmail() {
+        // Assume 'loggedUserPassword' holds the current password for the logged‐in user
+        String loggedUserEmail = this.loggedUser.getEmail();
+
+        String currentEmail;
+        while (true) {
+            System.out.print("Enter your current Email: ");
+            currentEmail = scanner.nextLine().trim();
+            if (currentEmail.equals(loggedUserEmail)) {
+                break;  // correct, exit loop
+            }
+            System.out.println("Incorrect Email. Please try again.");
+        }
+
+        String newEmail;
+            System.out.print("Enter your new Email: ");
+            newEmail = scanner.nextLine().trim();
+
+
+
+        this.loggedUser.setEmail(newEmail);
+        System.out.println("Your Email has been successfully changed.");
+
+        }
+
+    public void changeAdress() {
+        String loggedUserAdress = this.loggedUser.getAddress();
+
+        String currentAdress;
+        while (true) {
+            System.out.print("Enter your current Address: ");
+            currentAdress = scanner.nextLine().trim();
+            if (currentAdress.equals(loggedUserAdress)) {
+                break;  // correct, exit loop
+            }
+            System.out.println("Incorrect Address. Please try again.");
+        }
+
+        String newAddress;
+        System.out.print("Enter your new Address: ");
+        newAddress = scanner.nextLine().trim();
+
+
+        this.loggedUser.setAddress(newAddress);
+        System.out.println("Your Address has been successfully changed.");
+
+    }
+
+
+
+    }
