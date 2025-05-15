@@ -2,10 +2,11 @@ package org.spotifumtp37.model.user;
 
 import org.spotifumtp37.model.album.Song;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class History {
+public class History implements Serializable {
     private Song song;
     private LocalDateTime time;
 
@@ -19,7 +20,7 @@ public class History {
         this.song = null;
     }
 
-    public History ( History history ) {
+    public History(History history) {
         this.song = history.song;
         this.time = history.time;
     }

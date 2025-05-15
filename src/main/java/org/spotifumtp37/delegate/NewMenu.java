@@ -1,7 +1,9 @@
 package org.spotifumtp37.delegate;
 /*********************************************************************************/
-/** DISCLAIMER: Este código foi criado e alterado durante as aulas práticas      */
-/** de POO. Representa uma solução em construção, com base na matéria leccionada */ 
+/**
+ * DISCLAIMER: Este código foi criado e alterado durante as aulas práticas
+ */
+/** de POO. Representa uma solução em construção, com base na matéria leccionada */
 /** até ao momento da sua elaboração, e resulta da discussão e experimentação    */
 /** durante as aulas. Como tal, não deverá ser visto como uma solução canónica,  */
 /** ou mesmo acabada. É disponibilizado para auxiliar o processo de estudo.      */
@@ -9,7 +11,6 @@ package org.spotifumtp37.delegate;
 /** procurar soluções alternativas, à medida que forem adquirindo mais           */
 /** conhecimentos de POO.                                                        */
 /*********************************************************************************/
-
 
 
 import java.util.*;
@@ -32,7 +33,7 @@ public class NewMenu {
 
     /** Functional interface para pré-condições. */
     /** Podia ser utilizado Predicate<T> */
-    public interface PreCondition {  
+    public interface PreCondition {
         public boolean validate();
     }
 
@@ -55,9 +56,9 @@ public class NewMenu {
         this.opcoes = Arrays.asList(opcoes);
         this.disponivel = new ArrayList<>();
         this.handlers = new ArrayList<>();
-        this.opcoes.forEach(s-> {
-            this.disponivel.add(()->true);
-            this.handlers.add(()->System.out.println("\nATENÇÃO: Opção não implementada!"));
+        this.opcoes.forEach(s -> {
+            this.disponivel.add(() -> true);
+            this.handlers.add(() -> System.out.println("\nATENÇÃO: Opção não implementada!"));
         });
     }
 
@@ -74,11 +75,11 @@ public class NewMenu {
             show();
             op = readOption();
             // testar pré-condição
-            if (op>0 && !this.disponivel.get(op-1).validate()) {
+            if (op > 0 && !this.disponivel.get(op - 1).validate()) {
                 System.out.println("Opção indisponível! Tente novamente.");
-            } else if (op>0) {
+            } else if (op > 0) {
                 // executar handler
-                this.handlers.get(op-1).execute();
+                this.handlers.get(op - 1).execute();
             }
         } while (op != 0);
     }
@@ -90,7 +91,7 @@ public class NewMenu {
      * @param b pré-condição a registar
      */
     public void setPreCondition(int i, PreCondition b) {
-        this.disponivel.set(i-1,b);
+        this.disponivel.set(i - 1, b);
     }
 
     /**
@@ -100,7 +101,7 @@ public class NewMenu {
      * @param h handlers a registar
      */
     public void setHandler(int i, Handler h) {
-        this.handlers.set(i-1, h);
+        this.handlers.set(i - 1, h);
     }
 
     // Métodos auxiliares
@@ -108,10 +109,10 @@ public class NewMenu {
     /** Apresentar o NewMenu */
     private void show() {
         System.out.println("\n *** SpotifUM *** ");
-        for (int i=0; i<this.opcoes.size(); i++) {
-            System.out.print(i+1);
+        for (int i = 0; i < this.opcoes.size(); i++) {
+            System.out.print(i + 1);
             System.out.print(" - ");
-            System.out.println(this.disponivel.get(i).validate()?this.opcoes.get(i):"---");
+            System.out.println(this.disponivel.get(i).validate() ? this.opcoes.get(i) : "---");
         }
         System.out.println("0 - Exit");
     }
@@ -125,11 +126,10 @@ public class NewMenu {
         try {
             String line = is.nextLine();
             op = Integer.parseInt(line);
-        }
-        catch (NumberFormatException e) { // Não foi escrito um int
+        } catch (NumberFormatException e) { // Não foi escrito um int
             op = -1;
         }
-        if (op<0 || op>this.opcoes.size()) {
+        if (op < 0 || op > this.opcoes.size()) {
             System.out.println("Opção Inválida!!!");
             op = -1;
         }

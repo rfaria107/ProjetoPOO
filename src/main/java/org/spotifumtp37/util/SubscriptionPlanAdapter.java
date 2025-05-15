@@ -3,9 +3,12 @@ package org.spotifumtp37.util;
 
 import com.google.gson.*;
 import org.spotifumtp37.model.subscription.*;
+
 import java.lang.reflect.Type;
 
-/** Handles both writing and reading SubscriptionPlan subtypes */
+/**
+ * Handles both writing and reading SubscriptionPlan subtypes
+ */
 public class SubscriptionPlanAdapter
         implements JsonSerializer<SubscriptionPlan>, JsonDeserializer<SubscriptionPlan> {
 
@@ -23,10 +26,13 @@ public class SubscriptionPlanAdapter
         JsonObject obj = json.getAsJsonObject();
         String kind = obj.has("type") ? obj.get("type").getAsString() : "FreePlan";
         switch (kind) {
-            case "PremiumBase": return ctx.deserialize(obj, PremiumBase.class);
-            case "PremiumTop":  return ctx.deserialize(obj, PremiumTop.class);
+            case "PremiumBase":
+                return ctx.deserialize(obj, PremiumBase.class);
+            case "PremiumTop":
+                return ctx.deserialize(obj, PremiumTop.class);
             case "FreePlan":
-            default:            return ctx.deserialize(obj, FreePlan.class);
+            default:
+                return ctx.deserialize(obj, FreePlan.class);
         }
     }
 }

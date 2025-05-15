@@ -1,6 +1,8 @@
 package org.spotifumtp37.model.album;
 
-public class MultimediaSong extends Song {
+import java.io.Serializable;
+
+public class MultimediaSong extends Song implements Serializable {
     MultimediaSong(Song other) {
         super(other);
     }

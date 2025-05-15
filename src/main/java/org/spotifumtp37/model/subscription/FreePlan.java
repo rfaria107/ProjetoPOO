@@ -1,6 +1,8 @@
 package org.spotifumtp37.model.subscription;
 
-public class FreePlan implements SubscriptionPlan {
+import java.io.Serializable;
+
+public class FreePlan implements SubscriptionPlan, Serializable {
 
     @Override
     public double adicionaPontos(double pontos) {

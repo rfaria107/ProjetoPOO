@@ -415,9 +415,17 @@ public class TextUI {
 
     private void criaPlaylistUser() {
         List<Song> musicas = new ArrayList<>();
+
+        String nomePlaylist;
         System.out.println("Digite o nome da playlist: ");
-        String nomePlaylist = scanner.nextLine().trim();
-        if (!this.modelData.existePlaylist(nomePlaylist)) {
+        nomePlaylist = scanner.nextLine().trim();
+
+        while (this.modelData.existePlaylist(nomePlaylist)) {
+            System.out.println("A playlist já existe. Digite outro nome: ");
+            nomePlaylist = scanner.nextLine().trim();
+        }
+
+
         System.out.println("Indique descrição da playlist: ");
         String descricaoPlaylist = scanner.nextLine().trim();
         String estado;
@@ -431,8 +439,16 @@ public class TextUI {
         } while (!estado.equalsIgnoreCase("private")
                 && !estado.equalsIgnoreCase("public"));
 
+        int n = 0;
         System.out.println("Indique número inicial de músicas: ");
-        int n = scanner.nextInt();
+        n = scanner.nextInt();
+        scanner.nextLine();
+
+        while (n <= 0) {
+            System.out.println("Indique um número válido (>0): ");
+            n = scanner.nextInt();
+            scanner.nextLine();
+        }
 
         while (n > 0) {
             while (true) {
@@ -463,14 +479,14 @@ public class TextUI {
             }
             n--;
         }
+
         Playlist playlist = new Playlist(loggedUser, nomePlaylist, descricaoPlaylist, 0, estado, musicas);
-            try {
-                this.modelData.adicionaPlaylist(playlist);
-                System.out.println("Playlist created successfully!");
-            } catch (JaExisteException e) {
-                System.out.println(" There is already a playlist with that name. Try again with a different name.");
-            }
-        System.out.println("Playlist created successfully!");
+        try {
+            this.modelData.adicionaPlaylist(playlist);
+            System.out.println("Playlist created successfully!");
+        } catch (JaExisteException e) {
+            System.out.println(" There is already a playlist with that name. Try again with a different name.");
         }
+
     }
 }

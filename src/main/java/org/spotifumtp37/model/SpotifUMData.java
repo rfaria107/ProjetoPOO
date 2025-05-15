@@ -128,8 +128,7 @@ public class SpotifUMData implements Serializable {
                 }
             }
             return false;
-        }
-        else return false;
+        } else return false;
     }
 
     public boolean existePlaylist(String playlistName) {
@@ -155,8 +154,7 @@ public class SpotifUMData implements Serializable {
     public Album getAlbum(String title) throws NaoExisteException {
         if (!existeAlbum(title)) {
             throw new NaoExisteException(title);
-        }
-        else {
+        } else {
             return albuns.get(title).clone();
         }
     }
@@ -164,8 +162,7 @@ public class SpotifUMData implements Serializable {
     public Song getSong(String title, String albumTitle) throws NaoExisteException {
         if (!existeMusica(title, albumTitle)) {
             throw new NaoExisteException(title);
-        }
-        else {
+        } else {
             Album album = albuns.get(albumTitle);
             for (Song song : album.getSongs()) {
                 if (song.getName().equals(title)) {
@@ -179,8 +176,7 @@ public class SpotifUMData implements Serializable {
     public Playlist getPlaylist(String playlistName) throws NaoExisteException {
         if (!existePlaylist(playlistName) || playlists.get(playlistName).isPrivate()) {
             throw new NaoExisteException(playlistName);
-        }
-        else {
+        } else {
             return playlists.get(playlistName).clone();
         }
     }
@@ -188,8 +184,7 @@ public class SpotifUMData implements Serializable {
     public User getUser(String username) throws NaoExisteException {
         if (!existeUser(username)) {
             throw new NaoExisteException(username);
-        }
-        else {
+        } else {
             return users.get(username).clone();
         }
     }
@@ -197,8 +192,7 @@ public class SpotifUMData implements Serializable {
     public void adicionaAlbum(Album album) throws JaExisteException {
         if (!albuns.containsKey(album.getTitle())) {
             albuns.put(album.getTitle(), album.clone());
-        }
-        else {
+        } else {
             throw new JaExisteException(album.getTitle());
         }
     }
@@ -206,17 +200,15 @@ public class SpotifUMData implements Serializable {
     public void adicionaPlaylist(Playlist playlist) throws JaExisteException {
         if (!playlists.containsKey(playlist.getPlaylistName())) {
             playlists.put(playlist.getPlaylistName(), playlist.clone());
-        }
-        else {
+        } else {
             throw new JaExisteException(playlist.getPlaylistName());
         }
     }
 
-    public void adicionaUser (User user) throws JaExisteException {
+    public void adicionaUser(User user) throws JaExisteException {
         if (!users.containsKey(user.getName())) {
             users.put(user.getName(), user.clone());
-        }
-        else {
+        } else {
             throw new JaExisteException(user.getName());
         }
     }

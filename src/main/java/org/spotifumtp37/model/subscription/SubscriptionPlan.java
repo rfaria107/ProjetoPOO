@@ -1,8 +1,13 @@
 package org.spotifumtp37.model.subscription;
 
-public interface SubscriptionPlan {
+import java.io.Serializable;
+
+public interface SubscriptionPlan extends Serializable {
     double adicionaPontos(double pontos);
+
     boolean podeCriarPlaylist();
+
     boolean podeNavegarPlaylist();
+
     boolean podeAcessarPlaylistsGeradasAutomaticamente();
 }

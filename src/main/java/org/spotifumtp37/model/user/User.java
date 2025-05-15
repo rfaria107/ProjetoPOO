@@ -6,11 +6,12 @@ import org.spotifumtp37.model.subscription.PremiumBase;
 import org.spotifumtp37.model.subscription.PremiumTop;
 import org.spotifumtp37.model.subscription.SubscriptionPlan;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
     private final String name;
     private final String email;
     private final String address;
@@ -111,6 +112,7 @@ public class User {
         double newPontos = subscriptionplan.adicionaPontos(pontos); // Get the new points from the plan
         setPontos(newPontos);
     }
+
     public User clone() {
         return new User(this);
     }
@@ -121,7 +123,7 @@ public class User {
 
     public void updatePremiumTop(PremiumTop newPlan) {
         this.setSubscriptionPlan(newPlan);
-        this.pontos +=100;
+        this.pontos += 100;
     }
 
     public void updateFreePlan(FreePlan newPlan) {

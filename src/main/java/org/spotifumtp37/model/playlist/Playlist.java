@@ -3,12 +3,13 @@ package org.spotifumtp37.model.playlist;
 import org.spotifumtp37.model.album.Song;
 import org.spotifumtp37.model.user.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-public class Playlist implements Playable{
+public class Playlist implements Serializable, Playable {
     private User creator;
     private String playlistName;
     private String playlistDescription;
@@ -24,26 +25,26 @@ public class Playlist implements Playable{
         this.numberOfFollowers = numberOfFollowers;
         this.status = status;
         this.songs = new ArrayList<>();
-        for(Song song: songs){
+        for (Song song : songs) {
             this.songs.add(song);
         }
         Random rand = new Random();
-        int randomIndex = rand.nextInt(songs.size()-1);
+        int randomIndex = rand.nextInt(songs.size() - 1);
         this.currentSong = songs.get(randomIndex);
     }
 
-    public Playlist (Playlist other){
+    public Playlist(Playlist other) {
         this.creator = other.creator;
         this.playlistName = other.playlistName;
         this.playlistDescription = other.playlistDescription;
         this.numberOfFollowers = other.numberOfFollowers;
         this.status = other.status;
         this.songs = new ArrayList<>();
-        for(Song song: other.songs){
+        for (Song song : other.songs) {
             this.songs.add(song);
         }
         Random rand = new Random();
-        int randomIndex = rand.nextInt(songs.size()-1);
+        int randomIndex = rand.nextInt(songs.size() - 1);
         this.currentSong = songs.get(randomIndex);
     }
 
@@ -54,8 +55,12 @@ public class Playlist implements Playable{
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {return true;}
-        if (obj == null || getClass() != obj.getClass()) {return false;}
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         Playlist other = (Playlist) obj;
         return Objects.equals(creator, other.creator) && Objects.equals(playlistName, other.playlistName)
                 && Objects.equals(playlistDescription, other.playlistDescription) && numberOfFollowers == other.numberOfFollowers
@@ -92,7 +97,7 @@ public class Playlist implements Playable{
 
     public List<Song> getSongs() {
         List<Song> copy = new ArrayList<>();
-        for( Song song: songs){
+        for (Song song : songs) {
             copy.add(song);
         }
         return copy;
@@ -132,66 +137,62 @@ public class Playlist implements Playable{
         this.currentSong = currentSong.clone();
     }
 
-    public boolean isPrivate (){
+    public boolean isPrivate() {
         return status.equalsIgnoreCase("private");
     }
 
-    public boolean isPublic (){
+    public boolean isPublic() {
         return status.equalsIgnoreCase("public");
     }
 
     @Override
     public void next(User user) {
-        if (user.getSubscriptionPlan().podeNavegarPlaylist()){
-            currentSong = songs.get((songs.indexOf(currentSong)+1)%songs.size());
+        if (user.getSubscriptionPlan().podeNavegarPlaylist()) {
+            currentSong = songs.get((songs.indexOf(currentSong) + 1) % songs.size());
             currentSong.incrementTimesPlayed();
-        }
-        else {
+        } else {
             Random rand = new Random();
-            int randomIndex = rand.nextInt(songs.size()-1);
-            while (randomIndex == songs.indexOf(currentSong)){
-               randomIndex = rand.nextInt(songs.size()-1);
+            int randomIndex = rand.nextInt(songs.size() - 1);
+            while (randomIndex == songs.indexOf(currentSong)) {
+                randomIndex = rand.nextInt(songs.size() - 1);
             }
             currentSong = songs.get(randomIndex);
             currentSong.incrementTimesPlayed();
         }
         user.somarPontos();
     }
+
     @Override
     public void previous(User user) {
-        if (user.getSubscriptionPlan().podeNavegarPlaylist()){
-            currentSong = songs.get((songs.indexOf(currentSong)-1+songs.size()-1)%songs.size()-1);
+        if (user.getSubscriptionPlan().podeNavegarPlaylist()) {
+            currentSong = songs.get((songs.indexOf(currentSong) - 1 + songs.size() - 1) % songs.size() - 1);
             currentSong.incrementTimesPlayed();
-        }
-        else {
+        } else {
             throw new UnsupportedOperationException("Your subscription does not allow going back in the playlist.");
         }
         user.somarPontos();
     }
 
-    public void addSong(Song song){
-        if (creator.getSubscriptionPlan().podeCriarPlaylist()){
-            if(!songs.contains(song)){
-            songs.add(song.clone());
-            }
-            else {
+    public void addSong(Song song) {
+        if (creator.getSubscriptionPlan().podeCriarPlaylist()) {
+            if (!songs.contains(song)) {
+                songs.add(song.clone());
+            } else {
                 throw new UnsupportedOperationException("This song is already in the playlist.");
             }
-        }
-        else {
+        } else {
             throw new UnsupportedOperationException("Your subscription does not allow adding songs to the playlist.");
         }
     }
-    public void deleteSong(Song song){
-        if (creator.getSubscriptionPlan().podeCriarPlaylist()){
-            if (songs.contains(song)){
+
+    public void deleteSong(Song song) {
+        if (creator.getSubscriptionPlan().podeCriarPlaylist()) {
+            if (songs.contains(song)) {
                 songs.remove(song.clone());
-            }
-            else {
+            } else {
                 throw new UnsupportedOperationException("This song is not in the playlist.");
             }
-        }
-        else {
+        } else {
             throw new UnsupportedOperationException("Your subscription does not allow deleting songs from the playlist.");
         }
     }
