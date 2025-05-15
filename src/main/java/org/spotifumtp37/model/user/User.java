@@ -5,6 +5,8 @@ import org.spotifumtp37.model.subscription.FreePlan;
 import org.spotifumtp37.model.subscription.PremiumBase;
 import org.spotifumtp37.model.subscription.PremiumTop;
 import org.spotifumtp37.model.subscription.SubscriptionPlan;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -33,6 +35,8 @@ public class User implements Serializable {
             this.history.add(h.clone());
         }
     }
+
+
 
     public User(User other) {
         this.name = other.getName();
