@@ -46,9 +46,7 @@ public class Album implements Playable, Serializable {
         this.releaseYear = releaseYear;
         this.genre = genre;
         this.songs = copySongs(songs);
-        Random rand = new Random();
-        int randomIndex = rand.nextInt(songs.size() - 1);
-        this.currentSong = songs.get(randomIndex);
+        this.currentSong = new Song();
 
     }
 
@@ -57,10 +55,8 @@ public class Album implements Playable, Serializable {
         this.artist = other.getArtist();
         this.releaseYear = other.getReleaseYear();
         this.genre = other.getGenre();
-        this.songs = copySongs(other.getSongsCopy());
-        Random rand = new Random();
-        int randomIndex = rand.nextInt(songs.size() - 1);
-        this.currentSong = songs.get(randomIndex);
+        this.songs = copySongs(other.getSongs());
+        this.currentSong = new Song(other.getCurrentSong());
     }
 
     public List<Song> copySongs(List<Song> songs) {
@@ -106,6 +102,12 @@ public class Album implements Playable, Serializable {
 
     public String getTitle() {
         return title;
+    }
+
+    public void setCurrentSong(){
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(songs.size() - 1);
+        this.currentSong = songs.get(randomIndex);
     }
 
     public void setTitle(String title) {
