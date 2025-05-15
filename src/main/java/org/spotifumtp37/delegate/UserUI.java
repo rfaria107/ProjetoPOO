@@ -308,6 +308,7 @@ public class UserUI {
         String currentPassword;
         while (true) {
             System.out.print("Enter your current password: ");
+            currentPassword = scanner.nextLine();
             currentPassword = scanner.nextLine().trim();
             if (currentPassword.equals(loggedUserPassword)) {
                 break;  // correct, exit loop
