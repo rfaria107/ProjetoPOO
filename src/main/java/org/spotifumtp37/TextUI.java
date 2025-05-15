@@ -391,9 +391,9 @@ public class TextUI {
 
         List<Song> musicas = new ArrayList<>();
         System.out.println("Digite o nome da playlist: ");
-        String nomePlaylist = scanner.nextLine();
+        String nomePlaylist = scanner.nextLine().trim();
         System.out.println("Indique descrição da playlist: ");
-        String descricaoPlaylist = scanner.nextLine();
+        String descricaoPlaylist = scanner.nextLine().trim();
         String estado;
         do {
             System.out.println("Estado (private ou public):");
@@ -402,14 +402,14 @@ public class TextUI {
                     && !estado.equalsIgnoreCase("public")) {
                 System.out.println("Opção inválida! Digite apenas 'private' ou 'public'.");
             }
-        } while (!estado.equalsIgnoreCase("Privado")
-                && !estado.equalsIgnoreCase("Público"));
+        } while (!estado.equalsIgnoreCase("private")
+                && !estado.equalsIgnoreCase("public"));
         System.out.println("Indique número inicial de músicas: ");
         int n = scanner.nextInt();
         while (n > 0) {
             while (true) {
                 System.out.println("Indique o nome do albúm da música:");
-                String nomeAlbum = scanner.nextLine();
+                String nomeAlbum = scanner.nextLine().trim();
                 try {
                     System.out.println(this.modelData.getAlbum(nomeAlbum));
                     break;
@@ -418,7 +418,7 @@ public class TextUI {
                 }
                 while (true) {
                     System.out.println("Escolha a musica que deseja adicionar á playlist:");
-                    String nomeMusica = scanner.nextLine();
+                    String nomeMusica = scanner.nextLine().trim();
                     try {
                         musicas.add(this.modelData.getSong(nomeMusica, nomeAlbum));
                         break;
@@ -433,6 +433,7 @@ public class TextUI {
         while ( true){
             try{
                 this.modelData.adicionaPlaylist(playlist);
+                System.out.println("Playlist criada caralho!");
                 break;
             }
             catch (JaExisteException e){
