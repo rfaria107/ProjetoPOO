@@ -66,19 +66,21 @@ public class UserUI {
     public void showUserPlaylistManagementMenu() {
         NewMenu userPlaylistMenu = new NewMenu(new String[]{
                 "Create User Playlist",
+                "Add song to playlist",
                 "Create Recommended Playlist",
                 "View My Playlists",
                 "Delete Playlist"
         });
 
         userPlaylistMenu.setPreCondition(1, () -> this.loggedUser.getSubscriptionPlan().canCreatePlaylist());
-        userPlaylistMenu.setPreCondition(2, () -> this.loggedUser.getSubscriptionPlan().canAcessFavouritesList());
-        userPlaylistMenu.setPreCondition(4, () -> this.loggedUser.getSubscriptionPlan().canCreatePlaylist());
+        userPlaylistMenu.setPreCondition(2, () -> this.loggedUser.getSubscriptionPlan().canCreatePlaylist());
+        userPlaylistMenu.setPreCondition(3, () -> this.loggedUser.getSubscriptionPlan().canAcessFavouritesList());
+        userPlaylistMenu.setPreCondition(5, () -> this.loggedUser.getSubscriptionPlan().canCreatePlaylist());
 
         userPlaylistMenu.setHandler(1, this::createPlaylist);
-        //playlistMenu.setHandler(2, this::);
-        userPlaylistMenu.setHandler(3, this::viewUserPlaylists);
-        userPlaylistMenu.setHandler(4, this::deletePlaylist);
+        userPlaylistMenu.setHandler(2, this::addSongToPlaylist);
+        userPlaylistMenu.setHandler(4, this::viewUserPlaylists);
+        userPlaylistMenu.setHandler(5, this::deletePlaylist);
 
         userPlaylistMenu.run();
     }
@@ -217,15 +219,52 @@ public class UserUI {
         }
     }
 
-    public void viewUserPlaylists() {
-        System.out.println("Your Playlists");
-        for (Playlist playlist : modelData.getMapPlaylists().values()) {
-            if (playlist.getCreator().getName().equals(this.loggedUser.getName())) {
-                System.out.println(playlist);
+
+    private void addSongToPlaylist() {
+        String nomePlaylist;
+        Playlist playlist;
+        System.out.println("Digite o nome da playlist: ");
+
+        nomePlaylist = scanner.nextLine().trim();
+        while (!this.modelData.existePlaylist(nomePlaylist)) {
+            System.out.println("A playlist não existe. Digite outro nome: ");
+            nomePlaylist = scanner.nextLine().trim();
+        }
+        try {
+            playlist = this.modelData.getPlaylist(nomePlaylist);}
+        catch (NaoExisteException e) {
+            System.out.println("Incorrect name, does not exist");
+            return;
+        }
+        while (true) {
+            System.out.println("Indique o nome do albúm da música a adicionar:");
+            String nomeAlbum = scanner.nextLine().trim();
+            try {
+                Album album = this.modelData.getAlbum(nomeAlbum);
+                for (Song song : album.getSongs()) {
+                    System.out.println(song.getName());
+                }
+                while (true) {
+                    System.out.println("Escolha a musica que deseja adicionar á playlist:");
+                    String nomeMusica = scanner.nextLine().trim();
+                    try {
+                        playlist.addSong(this.modelData.getSong(nomeMusica, nomeAlbum));
+                        System.out.println("Song added to playlist");
+                        break;
+                    } catch (NaoExisteException e) {
+                        System.out.println("Incorrect name, does not exist");
+                    }
+                }
+                break;
+            } catch (NaoExisteException e) {
+                System.out.println("Incorrect name, does not exist");
             }
         }
     }
-
+    private void viewUserPlaylists() {
+        this.modelData.getPlaylistMapByCreator(loggedUser).keySet()
+                .forEach(System.out::println);
+    }
     public void deletePlaylist() {
         System.out.println("Deleting Playlist");
         System.out.print("Enter the name of the playlist to delete: ");
