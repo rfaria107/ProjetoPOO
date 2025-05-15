@@ -38,8 +38,6 @@ public class UserUI {
                 "Edit Profile"
         });
 
-        userMenu.setPreCondition(2, () -> loggedUser.getSubscriptionPlan().canCreatePlaylist());
-
         userMenu.setHandler(1, this::showMusicSelectionMenu);
         userMenu.setHandler(2, this::showUserPlaylistManagementMenu);
         userMenu.setHandler(3, this::showChangeSubscriptionMenu);
@@ -188,7 +186,7 @@ public class UserUI {
                 try {
                     Album album = this.modelData.getAlbum(nomeAlbum);
                     for (Song song : album.getSongs()) {
-                        System.out.println(song);
+                        System.out.println(song.getName());
                     }
                     while (true) {
                         System.out.println("Type the name of the song you want to add to the playlist: ");
@@ -261,10 +259,12 @@ public class UserUI {
             }
         }
     }
+
     private void viewUserPlaylists() {
         this.modelData.getPlaylistMapByCreator(loggedUser).keySet()
                 .forEach(System.out::println);
     }
+
     public void deletePlaylist() {
         System.out.println("Deleting Playlist");
         System.out.print("Enter the name of the playlist to delete: ");

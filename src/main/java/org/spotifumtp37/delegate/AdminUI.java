@@ -51,7 +51,7 @@ public class AdminUI {
         NewMenu albumMenu = new NewMenu(new String[]{
                 "Add New Album",
                 "Delete Album",
-                "View All Albums"
+                "View All Albums"//todo
         });
 
 
@@ -63,13 +63,8 @@ public class AdminUI {
 
     public void showUserManagementMenu() {
         NewMenu userManagementMenu = new NewMenu(new String[]{
-                "Add New User",
-                "Edit User Details",
-                "Manage User Subscriptions",
-                "Reset User Password",
                 "Delete User",
-                "View All Users",
-                "Search Users"
+                "View All Users"
         });
 
 
@@ -82,7 +77,7 @@ public class AdminUI {
         NewMenu playlistManagementMenu = new NewMenu(new String[]{
                 "Create Playlist",
                 "Delete Playlist",
-                "View All Playlists",
+                "View All Playlists",//todo
         });
 
         playlistManagementMenu.setHandler(1, this::createPlaylistAdmin);
@@ -113,9 +108,9 @@ public class AdminUI {
 
     public void showStatisticsMenu() {
         NewMenu statsMenu = new NewMenu(new String[]{
-                "View Most Popular Albums",
-                "View Most Active Users",
-                "View Subscription Statistics"
+                "View Most Popular Albums",//todo
+                "View Most Active Users",//todo
+                "View Subscription Statistics"//todo
         });
 
         // Implement handlers here
@@ -205,10 +200,10 @@ public class AdminUI {
     }
 
     public void createAlbum() {
-        System.out.println("=== Criar Novo Álbum ===");
+        System.out.println("Admin: Create New Album");
 
         String titulo;
-        System.out.print("Título do álbum: ");
+        System.out.print("Album title: ");
         titulo = scanner.nextLine().trim();
         while (this.modelData.existeAlbum(titulo)) {
             System.out.print("Já existe álbum com esse título. Informe outro: ");
@@ -299,7 +294,6 @@ public class AdminUI {
         System.out.print("Title of the album to delete: ");
         String titulo = scanner.nextLine().trim();
 
-        // Confirma existência
         while (!modelData.existeAlbum(titulo)) {
             System.out.print("Album not found. Enter another title (or 'exit' to cancel): ");
             titulo = scanner.nextLine().trim();
@@ -309,7 +303,6 @@ public class AdminUI {
             }
         }
 
-        // Confirmação final
         System.out.printf("Are you sure you want to delete the album '%s'? (y/n): ", titulo);
         String confirma = scanner.nextLine().trim();
         if (!confirma.equalsIgnoreCase("y")) {
@@ -317,7 +310,6 @@ public class AdminUI {
             return;
         }
 
-        // Apaga
         try {
             modelData.removeAlbum(titulo);
             System.out.println("Album deleted successfully.");
@@ -329,7 +321,7 @@ public class AdminUI {
 
     public void createPlaylistAdmin() {
         System.out.println("Admin: Create Playlist");
-        // scanner.nextLine(); // Consume leftover newline if necessary
+        scanner.nextLine();
 
         User playlistOwner = null;
         System.out.print("Enter username of the playlist owner (leave blank for a general/system playlist): ");
@@ -339,13 +331,9 @@ public class AdminUI {
                 playlistOwner = modelData.getUser(ownerUsername);
             } catch (NaoExisteException e) {
                 System.out.println("User '" + ownerUsername + "' not found. Playlist will be general if you proceed without a valid owner.");
-                // Optionally, ask again or default to null owner
             }
         }
 
-        // The rest of the playlist creation logic (name, description, songs)
-        // is similar to UserUI.createPlaylist but uses playlistOwner (which could be null)
-        // For example:
         List<Song> musicas = new ArrayList<>();
         System.out.println("Enter the name for the new playlist: ");
         String nomePlaylist = scanner.nextLine().trim();
@@ -354,7 +342,6 @@ public class AdminUI {
             System.out.println("A playlist with this name already exists. Please choose another name: ");
             nomePlaylist = scanner.nextLine().trim();
         }
-        // ... (description, state, adding songs, etc.)
         System.out.println("Indique descrição da playlist: ");
         String descricaoPlaylist = scanner.nextLine().trim();
         String estado;
@@ -367,8 +354,6 @@ public class AdminUI {
             }
         } while (!estado.equalsIgnoreCase("private")
                 && !estado.equalsIgnoreCase("public"));
-        // ... song adding logic ...
-
 
         Playlist playlist = new Playlist(playlistOwner, nomePlaylist, descricaoPlaylist, 0, estado, musicas);
         try {
@@ -383,7 +368,7 @@ public class AdminUI {
 
     public void deletePlaylistAdmin() {
         System.out.println("Admin: Delete Playlist");
-        // scanner.nextLine(); // Consume leftover newline if necessary
+        scanner.nextLine();
         System.out.print("Enter the name of the playlist to delete: ");
         String nome = scanner.nextLine().trim();
 

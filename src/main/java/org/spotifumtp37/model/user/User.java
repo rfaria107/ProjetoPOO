@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class User implements Serializable {
     private final String name;
@@ -146,5 +147,14 @@ public class User implements Serializable {
                 ", history=" + history +
                 '}';
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(name, user.name); // Compare by name
+    }
+
+
 }
 
