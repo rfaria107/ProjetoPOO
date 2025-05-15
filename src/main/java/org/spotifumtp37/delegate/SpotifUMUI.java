@@ -1,22 +1,12 @@
 package org.spotifumtp37.delegate;
 
 import org.spotifumtp37.model.SpotifUMData;
-import org.spotifumtp37.model.album.Album;
-import org.spotifumtp37.model.album.Song;
 import org.spotifumtp37.model.exceptions.JaExisteException;
 import org.spotifumtp37.model.exceptions.NaoExisteException;
-import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.subscription.FreePlan;
-import org.spotifumtp37.model.subscription.PremiumBase;
-import org.spotifumtp37.model.subscription.PremiumTop;
 import org.spotifumtp37.model.user.User;
-import org.spotifumtp37.util.JsonDataParser;
 
-import java.io.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Scanner;
 
 public class SpotifUMUI {
