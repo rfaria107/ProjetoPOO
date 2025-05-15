@@ -1,4 +1,4 @@
-package org.spotifumtp37.model;
+package org.spotifumtp37.model.user;
 
 import org.spotifumtp37.model.album.Song;
 

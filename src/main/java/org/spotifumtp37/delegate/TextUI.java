@@ -1,4 +1,4 @@
-package org.spotifumtp37;
+package org.spotifumtp37.delegate;
 
 import org.spotifumtp37.model.SpotifUMData;
 import org.spotifumtp37.model.album.Album;
@@ -9,12 +9,10 @@ import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.subscription.FreePlan;
 import org.spotifumtp37.model.subscription.PremiumBase;
 import org.spotifumtp37.model.subscription.PremiumTop;
-import org.spotifumtp37.model.subscription.SubscriptionPlan;
 import org.spotifumtp37.model.user.User;
 import org.spotifumtp37.util.JsonDataParser;
 
-import java.io.IOException;
-import java.sql.SQLOutput;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +20,7 @@ import java.util.Scanner;
 
 public class TextUI {
     private final Scanner scanner;
-    private final SpotifUMData modelData;
+    private SpotifUMData modelData;
     private final JsonDataParser parser = new JsonDataParser();
     private User loggedUser;
 
@@ -86,19 +84,20 @@ public class TextUI {
     }
 
     private void showUserManagementMenu() {
-        NewMenu userMenu = new NewMenu(new String[]{
+        NewMenu userManagementMenu = new NewMenu(new String[]{
                 "Add New User",
                 "Edit User Details",
                 "Manage User Subscriptions",
                 "Reset User Password",
                 "Delete User",
                 "View All Users",
-                "Search Users",
-                "Back to Admin Menu"
+                "Search Users"
         });
 
         // Implement handlers here
-        userMenu.run();
+        userManagementMenu.setHandler(1, this::signUpAsUser);
+
+        userManagementMenu.run();
     }
 
     private void showPlaylistManagementMenu() {
@@ -114,18 +113,22 @@ public class TextUI {
         NewMenu dataMenu = new NewMenu(new String[]{
                 "Import Data from JSON",
                 "Export Data to JSON",
-                "Backup System Data",
-                "Restore from Backup",
+                "Serialize System Data",
+                "Deserialize System Data",
+                "Backup System Data into JSON",
+                "Restore from JSON Backup",
                 "Clear System Data",
                 "DEBUG PRINT DATA"
         });
 
         dataMenu.setHandler(1, this::loadData);
         dataMenu.setHandler(2, this::saveData);
-        dataMenu.setHandler(3, this::backupData);
-        dataMenu.setHandler(4, this::restoreData); // Optional
-        dataMenu.setHandler(5, this::clearSystemData);
-        dataMenu.setHandler(6, this::printCurrentData);
+        dataMenu.setHandler(3, this::serializeData);
+        dataMenu.setHandler(4, this::deserializeData);
+        dataMenu.setHandler(5, this::backupData);
+        dataMenu.setHandler(6, this::restoreData);
+        dataMenu.setHandler(7, this::clearSystemData);
+        dataMenu.setHandler(8, this::printCurrentData);
 
         dataMenu.run();
     }
@@ -150,7 +153,7 @@ public class TextUI {
         });
 
         //userMenu.setHandler(1, this::playAlbum);
-        //userMenu.setHandler(2, this::listAlbums);
+        userMenu.setHandler(2, this::showUserPlaylistManagementMenu);
         //userMenu.setHandler(3, this::searchAlbum);
 
         // Only allow premium users to navigate through songs
@@ -192,7 +195,7 @@ public class TextUI {
 
         userPlaylistMenu.setPreCondition(1, () -> this.loggedUser.getSubscriptionPlan().podeCriarPlaylist());
 
-        userPlaylistMenu.setHandler(1, () -> criaPlaylistUser());
+        userPlaylistMenu.setHandler(1, this::criaPlaylistUser);
         //playlistMenu.setHandler(2, this::viewPlaylists);
         //playlistMenu.setHandler(3, this::addSongToPlaylist);
         //playlistMenu.setHandler(4, this::removeSongFromPlaylist);
@@ -219,9 +222,9 @@ public class TextUI {
                 .getSubscriptionPlan()
                 .equals(new PremiumTop()));
 
-        changeSubscriptionMenu.setHandler(1, () -> alteraSubscriptionFreePlan());
-        changeSubscriptionMenu.setHandler(2, () -> alteraSubscriptionPremiumBasePlan());
-        changeSubscriptionMenu.setHandler(3, () -> alteraSubscriptionPremiumTopPlan());
+        changeSubscriptionMenu.setHandler(1, this::alteraSubscriptionFreePlan);
+        changeSubscriptionMenu.setHandler(2, this::alteraSubscriptionPremiumBasePlan);
+        changeSubscriptionMenu.setHandler(3, this::alteraSubscriptionPremiumTopPlan);
 
         changeSubscriptionMenu.run();
     }
@@ -357,7 +360,6 @@ public class TextUI {
         System.out.println(" SpotifUMData has been cleared.");
     }
 
-
     public void loadFromJson(String filePath) throws IOException {
         SpotifUMData loaded = parser.fromJsonData(filePath);
         modelData.setMapAlbums(loaded.getMapAlbums());
@@ -371,6 +373,29 @@ public class TextUI {
 
     private void printCurrentData() {
         System.out.println(modelData.toString());
+    }
+
+
+    private void serializeData() {
+        System.out.print("Enter file path to save serialized data: ");
+        String path = scanner.nextLine();
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(path))) {
+            out.writeObject(modelData);
+            System.out.println("Data serialized successfully!");
+        } catch (IOException e) {
+            System.out.println("Error serializing data: " + e.getMessage());
+        }
+    }
+
+    private void deserializeData() {
+        System.out.print("Enter file path to load serialized data: ");
+        String path = scanner.nextLine();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(path))) {
+            modelData = (SpotifUMData) in.readObject();
+            System.out.println("Data deserialized successfully!");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error deserializing data: " + e.getMessage());
+        }
     }
 
     private void alteraSubscriptionFreePlan() {
@@ -389,7 +414,6 @@ public class TextUI {
     }
 
     private void criaPlaylistUser() {
-
         List<Song> musicas = new ArrayList<>();
         System.out.println("Digite o nome da playlist: ");
         String nomePlaylist = scanner.nextLine().trim();
@@ -405,45 +429,49 @@ public class TextUI {
             }
         } while (!estado.equalsIgnoreCase("private")
                 && !estado.equalsIgnoreCase("public"));
+
         System.out.println("Indique número inicial de músicas: ");
         int n = scanner.nextInt();
+
         while (n > 0) {
             while (true) {
                 System.out.println("Indique o nome do albúm da música:");
                 String nomeAlbum = scanner.nextLine().trim();
+
                 try {
                     Album album = this.modelData.getAlbum(nomeAlbum);
                     for (Song song : album.getSongs()) {
-                        System.out.println( song);
+                        System.out.println(song);
+                    }
+                    while (true) {
+                        System.out.println("Escolha a musica que deseja adicionar á playlist:");
+                        String nomeMusica = scanner.nextLine().trim();
+                        try {
+                            musicas.add(this.modelData.getSong(nomeMusica, nomeAlbum));
+                            System.out.println("Song added to playlist");
+                            break;
+                        } catch (NaoExisteException e) {
+                            System.out.println("Incorrect name, does not exist");
+                        }
                     }
                     break;
+
                 } catch (NaoExisteException e) {
                     System.out.println("Nome incorreto, não existe");
-                }
-                while (true) {
-                    System.out.println("Escolha a musica que deseja adicionar á playlist:");
-                    String nomeMusica = scanner.nextLine().trim();
-                    try {
-                        musicas.add(this.modelData.getSong(nomeMusica, nomeAlbum));
-                        break;
-                    } catch (NaoExisteException e) {
-                        System.out.println("Nome incorreto, nao existe");
-                    }
                 }
             }
             n--;
         }
-        Playlist playlist = new Playlist(loggedUser, nomePlaylist, descricaoPlaylist,0, estado, musicas);
-        while ( true){
-            try{
+
+        Playlist playlist = new Playlist(loggedUser, nomePlaylist, descricaoPlaylist, 0, estado, musicas);
+        while (true) {
+            try {
                 this.modelData.adicionaPlaylist(playlist);
-                System.out.println("Playlist criada caralho!");
                 break;
-            }
-            catch (JaExisteException e){
+            } catch (JaExisteException e) {
                 System.out.println(" Já existe uma playlist com esse nome! Tente novamente.");
             }
         }
+        System.out.println("Playlist created successfully!");
     }
-
 }

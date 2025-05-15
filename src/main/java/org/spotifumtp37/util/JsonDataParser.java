@@ -21,7 +21,7 @@ public class JsonDataParser {
     private static final String USERS_FILE = "users.json";
     private static final String ALBUMS_FILE = "albums.json";
     private static final String PLAYLISTS_FILE = "playlists.json";
-    
+
     private final Gson gson;
 
     public JsonDataParser() {
@@ -68,11 +68,12 @@ public class JsonDataParser {
 
     private SpotifUMData loadFromMultipleFiles(String directoryPath) throws IOException {
         SpotifUMData data = new SpotifUMData();
-        
+
         // Load users
         File usersFile = new File(directoryPath, USERS_FILE);
         if (usersFile.exists()) {
-            Type userMapType = new TypeToken<Map<String, User>>(){}.getType();
+            Type userMapType = new TypeToken<Map<String, User>>() {
+            }.getType();
             try (FileReader reader = new FileReader(usersFile)) {
                 Map<String, User> users = gson.fromJson(reader, userMapType);
                 data.setMapUsers(users);
@@ -82,7 +83,8 @@ public class JsonDataParser {
         // Load albums
         File albumsFile = new File(directoryPath, ALBUMS_FILE);
         if (albumsFile.exists()) {
-            Type albumMapType = new TypeToken<Map<String, Album>>(){}.getType();
+            Type albumMapType = new TypeToken<Map<String, Album>>() {
+            }.getType();
             try (FileReader reader = new FileReader(albumsFile)) {
                 Map<String, Album> albums = gson.fromJson(reader, albumMapType);
                 data.setMapAlbums(albums);
@@ -92,7 +94,8 @@ public class JsonDataParser {
         // Load playlists
         File playlistsFile = new File(directoryPath, PLAYLISTS_FILE);
         if (playlistsFile.exists()) {
-            Type playlistMapType = new TypeToken<Map<String, Playlist>>(){}.getType();
+            Type playlistMapType = new TypeToken<Map<String, Playlist>>() {
+            }.getType();
             try (FileReader reader = new FileReader(playlistsFile)) {
                 Map<String, Playlist> playlists = gson.fromJson(reader, playlistMapType);
                 data.setMapPlaylists(playlists);
@@ -139,7 +142,8 @@ public class JsonDataParser {
     public Map<String, Album> loadAlbumsOnly(String directoryPath) throws IOException {
         File albumsFile = new File(directoryPath, ALBUMS_FILE);
         if (albumsFile.exists()) {
-            Type albumMapType = new TypeToken<Map<String, Album>>(){}.getType();
+            Type albumMapType = new TypeToken<Map<String, Album>>() {
+            }.getType();
             try (FileReader reader = new FileReader(albumsFile)) {
                 return gson.fromJson(reader, albumMapType);
             }
@@ -153,7 +157,8 @@ public class JsonDataParser {
     public Map<String, User> loadUsersOnly(String directoryPath) throws IOException {
         File usersFile = new File(directoryPath, USERS_FILE);
         if (usersFile.exists()) {
-            Type userMapType = new TypeToken<Map<String, User>>(){}.getType();
+            Type userMapType = new TypeToken<Map<String, User>>() {
+            }.getType();
             try (FileReader reader = new FileReader(usersFile)) {
                 return gson.fromJson(reader, userMapType);
             }
@@ -167,7 +172,8 @@ public class JsonDataParser {
     public Map<String, Playlist> loadPlaylistsOnly(String directoryPath) throws IOException {
         File playlistsFile = new File(directoryPath, PLAYLISTS_FILE);
         if (playlistsFile.exists()) {
-            Type playlistMapType = new TypeToken<Map<String, Playlist>>(){}.getType();
+            Type playlistMapType = new TypeToken<Map<String, Playlist>>() {
+            }.getType();
             try (FileReader reader = new FileReader(playlistsFile)) {
                 return gson.fromJson(reader, playlistMapType);
             }

@@ -6,9 +6,13 @@ import org.spotifumtp37.model.exceptions.NaoExisteException;
 import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.user.*;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.*;
 
-public class SpotifUMData {
+public class SpotifUMData implements Serializable {
     //basicamente a facade do model? tem todos os dados e é a esta que o controller deve aceder
     private Map<String, Album> albuns;
     private Map<String, User> users;
@@ -165,7 +169,7 @@ public class SpotifUMData {
             Album album = albuns.get(albumTitle);
             for (Song song : album.getSongs()) {
                 if (song.getName().equals(title)) {
-                    return song.clone();
+                    return song;
                 }
             }
         }

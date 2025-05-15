@@ -1,6 +1,5 @@
 package org.spotifumtp37.model.user;
 
-import org.spotifumtp37.model.History;
 import org.spotifumtp37.model.album.Song;
 import org.spotifumtp37.model.subscription.FreePlan;
 import org.spotifumtp37.model.subscription.PremiumBase;
