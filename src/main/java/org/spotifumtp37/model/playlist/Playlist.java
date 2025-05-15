@@ -176,7 +176,7 @@ public class Playlist implements Serializable, Playable {
     public void addSong(Song song) {
         if (creator.getSubscriptionPlan().podeCriarPlaylist()) {
             if (!songs.contains(song)) {
-                songs.add(song.clone());
+                songs.add(song);
             } else {
                 throw new UnsupportedOperationException("This song is already in the playlist.");
             }

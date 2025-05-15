@@ -13,10 +13,7 @@ import org.spotifumtp37.model.user.User;
 import org.spotifumtp37.util.JsonDataParser;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class TextUI {
     private final Scanner scanner;
@@ -185,7 +182,7 @@ public class TextUI {
     private void showUserPlaylistManagementMenu() {
         NewMenu userPlaylistMenu = new NewMenu(new String[]{
                 "Create User Playlist",
-                "Create Recommended Playlist",
+                //"Create Recommended Playlist",
                 "View My Playlists",
                 "Add Song to Playlist",
                 "Remove Song from Playlist",
@@ -194,9 +191,12 @@ public class TextUI {
         });
 
         userPlaylistMenu.setPreCondition(1, () -> this.loggedUser.getSubscriptionPlan().podeCriarPlaylist());
+        userPlaylistMenu.setPreCondition(2, () -> this.loggedUser.getSubscriptionPlan().podeCriarPlaylist());
+        userPlaylistMenu.setPreCondition(3, () -> this.loggedUser.getSubscriptionPlan().podeCriarPlaylist());
 
         userPlaylistMenu.setHandler(1, this::criaPlaylistUser);
-        //playlistMenu.setHandler(2, this::viewPlaylists);
+        userPlaylistMenu.setHandler(2, this::viewUserPlaylists);
+        userPlaylistMenu.setHandler(3, this::addSongToPlaylist);
         //playlistMenu.setHandler(3, this::addSongToPlaylist);
         //playlistMenu.setHandler(4, this::removeSongFromPlaylist);
 
@@ -458,7 +458,7 @@ public class TextUI {
                 try {
                     Album album = this.modelData.getAlbum(nomeAlbum);
                     for (Song song : album.getSongs()) {
-                        System.out.println(song);
+                        System.out.println(song.getName());
                     }
                     while (true) {
                         System.out.println("Escolha a musica que deseja adicionar á playlist:");
@@ -488,5 +488,56 @@ public class TextUI {
             System.out.println(" There is already a playlist with that name. Try again with a different name.");
         }
 
+    }
+
+    private void viewUserPlaylists() {
+            this.modelData.getPlaylistMapByCreator(loggedUser).keySet()
+                    .forEach(System.out::println);
+        }
+
+
+    private void addSongToPlaylist() {
+        String nomePlaylist;
+        Playlist playlist;
+        System.out.println("Digite o nome da playlist: ");
+        nomePlaylist = scanner.nextLine().trim();
+
+        while (!this.modelData.existePlaylist(nomePlaylist)) {
+        System.out.println("A playlist não existe. Digite outro nome: ");
+        nomePlaylist = scanner.nextLine().trim();
+        }
+        try {
+        playlist = this.modelData.getPlaylist(nomePlaylist);}
+        catch (NaoExisteException e) {
+            System.out.println("Incorrect name, does not exist");
+            return;
+        }
+
+        while (true) {
+            System.out.println("Indique o nome do albúm da música a adicionar:");
+            String nomeAlbum = scanner.nextLine().trim();
+
+            try {
+                Album album = this.modelData.getAlbum(nomeAlbum);
+                for (Song song : album.getSongs()) {
+                    System.out.println(song.getName());
+                }
+                while (true) {
+                    System.out.println("Escolha a musica que deseja adicionar á playlist:");
+                    String nomeMusica = scanner.nextLine().trim();
+                    try {
+                        playlist.addSong(this.modelData.getSong(nomeMusica, nomeAlbum));
+                        System.out.println("Song added to playlist");
+                        break;
+                    } catch (NaoExisteException e) {
+                        System.out.println("Incorrect name, does not exist");
+                    }
+                }
+                break;
+
+            } catch (NaoExisteException e) {
+                System.out.println("Incorrect name, does not exist");
+            }
+        }
     }
 }
