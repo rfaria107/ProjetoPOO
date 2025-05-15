@@ -8,6 +8,7 @@ import org.spotifumtp37.model.user.*;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SpotifUMData implements Serializable {
     //basicamente a facade do model? tem todos os dados e é a esta que o controller deve aceder
@@ -174,7 +175,7 @@ public class SpotifUMData implements Serializable {
         if (!existePlaylist(playlistName) || playlists.get(playlistName).isPrivate()) {
             throw new NaoExisteException(playlistName);
         } else {
-            return playlists.get(playlistName).clone();
+            return playlists.get(playlistName);
         }
     }
 
@@ -225,6 +226,15 @@ public class SpotifUMData implements Serializable {
             throw new NaoExisteException(playlistName);
         }
     }
+    public Map<String, Playlist> getPlaylistMapByCreator(User creator) {
+        return playlists.entrySet().stream()
+                .filter(e -> e.getValue().getCreator().equals(creator))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ));
+    }
+
 }
 
 
