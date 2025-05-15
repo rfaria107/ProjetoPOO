@@ -29,7 +29,7 @@ public class Playlist implements Serializable, Playable {
             this.songs.add(song);
         }
         Random rand = new Random();
-        int randomIndex = rand.nextInt(songs.size() - 1);
+        int randomIndex = rand.nextInt(songs.size());
         this.currentSong = songs.get(randomIndex);
     }
 
@@ -44,7 +44,7 @@ public class Playlist implements Serializable, Playable {
             this.songs.add(song);
         }
         Random rand = new Random();
-        int randomIndex = rand.nextInt(songs.size() - 1);
+        int randomIndex = rand.nextInt(songs.size());
         this.currentSong = songs.get(randomIndex);
     }
 
@@ -147,7 +147,7 @@ public class Playlist implements Serializable, Playable {
 
     @Override
     public void next(User user) {
-        if (user.getSubscriptionPlan().podeNavegarPlaylist()) {
+        if (user.getSubscriptionPlan().canBrowsePlaylist()) {
             currentSong = songs.get((songs.indexOf(currentSong) + 1) % songs.size());
             currentSong.incrementTimesPlayed();
         } else {
@@ -164,7 +164,7 @@ public class Playlist implements Serializable, Playable {
 
     @Override
     public void previous(User user) {
-        if (user.getSubscriptionPlan().podeNavegarPlaylist()) {
+        if (user.getSubscriptionPlan().canBrowsePlaylist()) {
             currentSong = songs.get((songs.indexOf(currentSong) - 1 + songs.size() - 1) % songs.size() - 1);
             currentSong.incrementTimesPlayed();
         } else {
@@ -174,7 +174,7 @@ public class Playlist implements Serializable, Playable {
     }
 
     public void addSong(Song song) {
-        if (creator.getSubscriptionPlan().podeCriarPlaylist()) {
+        if (creator.getSubscriptionPlan().canCreatePlaylist()) {
             if (!songs.contains(song)) {
                 songs.add(song);
             } else {
@@ -186,7 +186,7 @@ public class Playlist implements Serializable, Playable {
     }
 
     public void deleteSong(Song song) {
-        if (creator.getSubscriptionPlan().podeCriarPlaylist()) {
+        if (creator.getSubscriptionPlan().canCreatePlaylist()) {
             if (songs.contains(song)) {
                 songs.remove(song.clone());
             } else {

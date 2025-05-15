@@ -6,31 +6,28 @@ import org.spotifumtp37.model.exceptions.NaoExisteException;
 import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.user.*;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class SpotifUMData implements Serializable {
     //basicamente a facade do model? tem todos os dados e é a esta que o controller deve aceder
-    private Map<String, Album> albuns;
+    private Map<String, Album> albums;
     private Map<String, User> users;
     private Map<String, Playlist> playlists;
 
     // falta os play e pause, contar as views da musica
 
     public SpotifUMData() {
-        this.albuns = new HashMap<>();
+        this.albums = new HashMap<>();
         this.users = new HashMap<>();
         this.playlists = new HashMap<>();
     }
 
     public SpotifUMData(SpotifUMData outro) {
-        this.albuns = new HashMap<>();
-        for (Map.Entry<String, Album> entry : outro.albuns.entrySet()) {
-            this.albuns.put(entry.getKey(), entry.getValue().clone());
+        this.albums = new HashMap<>();
+        for (Map.Entry<String, Album> entry : outro.albums.entrySet()) {
+            this.albums.put(entry.getKey(), entry.getValue().clone());
         }
         this.users = new HashMap<>();
         for (Map.Entry<String, User> entry : outro.users.entrySet()) {
@@ -49,7 +46,7 @@ public class SpotifUMData implements Serializable {
 
     @Override
     public String toString() {
-        return "Albuns: " + albuns.toString()
+        return "Albuns: " + albums.toString()
                 + "\nUsers: " + users.toString()
                 + "\nPlaylists: " + playlists.toString();
     }
@@ -59,14 +56,14 @@ public class SpotifUMData implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SpotifUMData that = (SpotifUMData) o;
-        return Objects.equals(albuns, that.albuns)
+        return Objects.equals(albums, that.albums)
                 && Objects.equals(users, that.users)
                 && Objects.equals(playlists, that.playlists);
     }
 
     public Map<String, Album> getMapAlbums() {
         Map<String, Album> mapCarros = new HashMap<>();
-        for (Map.Entry<String, Album> entry : albuns.entrySet()) {
+        for (Map.Entry<String, Album> entry : albums.entrySet()) {
             mapCarros.put(entry.getKey(), entry.getValue().clone());
         }
         return mapCarros;
@@ -97,7 +94,7 @@ public class SpotifUMData implements Serializable {
         for (Map.Entry<String, Album> entry : mapAlbums.entrySet()) {
             newMapCarros.put(entry.getKey(), entry.getValue().clone());
         }
-        this.albuns = newMapCarros;
+        this.albums = newMapCarros;
     }
 
     public void setMapUsers(Map<String, User> mapUsers) {
@@ -117,12 +114,12 @@ public class SpotifUMData implements Serializable {
     }
 
     public boolean existeAlbum(String title) {
-        return albuns.containsKey(title);
+        return albums.containsKey(title);
     }
 
     public boolean existeMusica(String title, String albumTitle) {
         if (existeAlbum(albumTitle)) {
-            Album album = albuns.get(albumTitle);
+            Album album = albums.get(albumTitle);
             for (Song song : album.getSongs()) {
                 if (song.getName().equals(title)) {
                     return true;
@@ -141,7 +138,7 @@ public class SpotifUMData implements Serializable {
     }
 
     public int quantosAlbums() {
-        return albuns.size();
+        return albums.size();
     }
 
     public int quantosPlaylists() {
@@ -156,7 +153,7 @@ public class SpotifUMData implements Serializable {
         if (!existeAlbum(title)) {
             throw new NaoExisteException(title);
         } else {
-            return albuns.get(title).clone();
+            return albums.get(title).clone();
         }
     }
 
@@ -164,7 +161,7 @@ public class SpotifUMData implements Serializable {
         if (!existeMusica(title, albumTitle)) {
             throw new NaoExisteException(title);
         } else {
-            Album album = albuns.get(albumTitle);
+            Album album = albums.get(albumTitle);
             for (Song song : album.getSongs()) {
                 if (song.getName().equals(title)) {
                     return song;
@@ -191,14 +188,14 @@ public class SpotifUMData implements Serializable {
     }
 
     public void adicionaAlbum(Album album) throws JaExisteException {
-        if (!albuns.containsKey(album.getTitle())) {
-            albuns.put(album.getTitle(), album.clone());
+        if (!albums.containsKey(album.getTitle())) {
+            albums.put(album.getTitle(), album.clone());
         } else {
             throw new JaExisteException(album.getTitle());
         }
     }
 
-    public void adicionaPlaylist(Playlist playlist) throws JaExisteException {
+    public void addPlaylist(Playlist playlist) throws JaExisteException {
         if (!playlists.containsKey(playlist.getPlaylistName())) {
             playlists.put(playlist.getPlaylistName(), playlist.clone());
         } else {
@@ -211,6 +208,22 @@ public class SpotifUMData implements Serializable {
             users.put(user.getName(), user.clone());
         } else {
             throw new JaExisteException(user.getName());
+        }
+    }
+
+    public void removeAlbum(String title) throws NaoExisteException {
+        if (albums.containsKey(title)) {
+            albums.remove(title);
+        } else {
+            throw new NaoExisteException(title);
+        }
+    }
+
+    public void removePlaylist(String playlistName) throws NaoExisteException {
+        if (playlists.containsKey(playlistName)) {
+            playlists.remove(playlistName);
+        } else {
+            throw new NaoExisteException(playlistName);
         }
     }
     public Map<String, Playlist> getPlaylistMapByCreator(User creator) {

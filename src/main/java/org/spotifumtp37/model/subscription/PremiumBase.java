@@ -4,22 +4,22 @@ import java.io.Serializable;
 
 public class PremiumBase implements Serializable, SubscriptionPlan {
     @Override
-    public double adicionaPontos(double pontos) {
-        return pontos + 10;
+    public double addPoints(double points) {
+        return points + 10;
     }
 
     @Override
-    public boolean podeCriarPlaylist() {
+    public boolean canCreatePlaylist() {
         return true;
     }
 
     @Override
-    public boolean podeNavegarPlaylist() {
+    public boolean canBrowsePlaylist() {
         return true;
     }
 
     @Override
-    public boolean podeAcessarPlaylistsGeradasAutomaticamente() {
+    public boolean canAcessFavouritesList() {
         return false;
     }
 }

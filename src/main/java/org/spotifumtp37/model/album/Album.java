@@ -145,7 +145,7 @@ public class Album implements Playable, Serializable {
 
     @Override
     public void next(User user) {
-        if (user.getSubscriptionPlan().podeNavegarPlaylist()) {
+        if (user.getSubscriptionPlan().canBrowsePlaylist()) {
             currentSong = songs.get((songs.indexOf(currentSong) + 1) % songs.size());
             currentSong.incrementTimesPlayed();
         } else {
@@ -162,7 +162,7 @@ public class Album implements Playable, Serializable {
 
     @Override
     public void previous(User user) {
-        if (user.getSubscriptionPlan().podeNavegarPlaylist()) {
+        if (user.getSubscriptionPlan().canBrowsePlaylist()) {
             currentSong = songs.get((songs.indexOf(currentSong) - 1 + songs.size() - 1) % songs.size() - 1);
             currentSong.incrementTimesPlayed();
         } else {
