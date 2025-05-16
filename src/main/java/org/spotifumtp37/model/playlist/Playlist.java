@@ -134,7 +134,7 @@ public class Playlist implements Serializable, Playable {
     }
 
     public void setCurrentSong(Song currentSong) {
-        this.currentSong = currentSong.clone();
+        this.currentSong = currentSong;
     }
 
     public boolean isPrivate() {

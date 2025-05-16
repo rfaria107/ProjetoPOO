@@ -58,12 +58,16 @@ public class SpotifUMData implements Serializable {
                 && Objects.equals(playlists, that.playlists);
     }
 
-    public Map<String, Album> getMapAlbums() {
+    public Map<String, Album> getMapAlbumsCopy() {
         Map<String, Album> mapCarros = new HashMap<>();
         for (Map.Entry<String, Album> entry : albums.entrySet()) {
             mapCarros.put(entry.getKey(), entry.getValue().clone());
         }
         return mapCarros;
+    }
+
+    public Map<String, Album> getMapAlbums() {
+        return new HashMap<>(albums);
     }
 
     public Map<String, User> getMapUsers() {
@@ -177,7 +181,7 @@ public class SpotifUMData implements Serializable {
     }
 
     public Playlist getAnyPlaylist(String playlistName,User creator) throws NaoExisteException {
-        if (existePlaylist(playlistName) && this.getPlaylistMapByCreator(creator).containsKey(playlistName)) {
+        if (existePlaylist(playlistName) && ( this.getPlaylistMapByCreator(creator).containsKey(playlistName) || playlists.get(playlistName).isPublic())) {
             return playlists.get(playlistName);
         } else {
             throw new NaoExisteException(playlistName);

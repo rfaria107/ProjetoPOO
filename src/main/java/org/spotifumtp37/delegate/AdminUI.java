@@ -119,7 +119,7 @@ public class AdminUI {
 
         // Handler for "Get Most Played Song"
         statsMenu.setHandler(1, () -> {
-            Song song = Stats.getMostPlayedSong(modelData.getMapAlbums());
+            Song song = Stats.getMostPlayedSong(modelData.getMapAlbumsCopy());
             if (song != null) {
                 System.out.println("Most Played Song: " + song.getName() + " by " + song.getArtist() +
                         " (Played " + song.getTimesPlayed() + " times)");
@@ -130,7 +130,7 @@ public class AdminUI {
 
         // Handler for "Get Most Listened Artist"
         statsMenu.setHandler(2, () -> {
-            String artist = Stats.getMostListenedArtist(modelData.getMapAlbums());
+            String artist = Stats.getMostListenedArtist(modelData.getMapAlbumsCopy());
             if (artist != null) {
                 System.out.println("Most Listened Artist: " + artist);
             } else {
@@ -217,7 +217,7 @@ public class AdminUI {
 
     public void loadFromJson(String filePath) throws IOException {
         SpotifUMData loaded = parser.fromJsonData(filePath);
-        modelData.setMapAlbums(loaded.getMapAlbums());
+        modelData.setMapAlbums(loaded.getMapAlbumsCopy());
         modelData.setMapUsers(loaded.getMapUsers());
         modelData.setMapPlaylists(loaded.getMapPlaylists());
     }
@@ -249,7 +249,7 @@ public class AdminUI {
         try (FileInputStream fileIn = new FileInputStream(filename)) {
             try (ObjectInputStream in = new ObjectInputStream(fileIn)) {
                 SpotifUMData deserializedData = (SpotifUMData) in.readObject();
-                this.modelData.setMapAlbums(deserializedData.getMapAlbums());
+                this.modelData.setMapAlbums(deserializedData.getMapAlbumsCopy());
                 this.modelData.setMapUsers(deserializedData.getMapUsers());
                 this.modelData.setMapPlaylists(deserializedData.getMapPlaylists());
 
@@ -407,7 +407,7 @@ public class AdminUI {
             }
         }
 
-        List<Song> musicas = new ArrayList<>();
+        List<Song> songs = new ArrayList<>();
         System.out.println("Enter the name for the new playlist: ");
         String nomePlaylist = scanner.nextLine().trim();
 
@@ -427,14 +427,61 @@ public class AdminUI {
             }
         } while (!estado.equalsIgnoreCase("private")
                 && !estado.equalsIgnoreCase("public"));
+        int n;
+        System.out.println("How many songs to add initially?: ");
+        // Input validation for integer
+        while (!scanner.hasNextInt()) {
+            System.out.println("That's not a valid number. Please enter an integer:");
+            scanner.next(); // consume the invalid input
+        }
+        n = scanner.nextInt();
+        scanner.nextLine(); // Consume the leftover newline
 
-        Playlist playlist = new Playlist(playlistOwner, nomePlaylist, descricaoPlaylist, 0, estado, musicas);
+        while (n <= 0) {
+            System.out.println("Type a number greater than 0: ");
+            while (!scanner.hasNextInt()) {
+                System.out.println("That's not a valid number. Please enter an integer:");
+                scanner.next(); // consume the invalid input
+            }
+            n = scanner.nextInt();
+            scanner.nextLine(); // Consume the leftover newline
+        }
+
+        while (n > 0) {
+            while (true) {
+                System.out.println("Type the name of the album of the song you want to add to the playlist: ");
+                String nomeAlbum = scanner.nextLine().trim();
+
+                try {
+                    Album album = this.modelData.getAlbum(nomeAlbum);
+                    System.out.println("Songs in album '" + album.getTitle() + "':");
+                    album.getSongsCopy().forEach(song -> System.out.println("- " + song.getName())); // Use getTitulo
+                    while (true) {
+                        System.out.println("Type the name of the song you want to add to the playlist: ");
+                        String nomeMusica = scanner.nextLine().trim();
+                        try {
+                            songs.add(this.modelData.getSong(nomeMusica, nomeAlbum));
+                            System.out.println("Song '" + nomeMusica + "' added to playlist");
+                            break;
+                        } catch (NaoExisteException e) {
+                            System.out.println("Incorrect song name, does not exist in album '" + nomeAlbum + "'. Try again.");
+                        }
+                    }
+                    break;
+
+                } catch (NaoExisteException e) {
+                    System.out.println("Incorrect album name, does not exist. Try again.");
+                }
+            }
+            n--;
+        }
+
+        Playlist playlist = new Playlist(playlistOwner, nomePlaylist, descricaoPlaylist, 0, estado, songs);
         try {
             this.modelData.addPlaylist(playlist);
-            String ownerInfo = (playlistOwner != null) ? " for user " + playlistOwner.getName() : " (general)";
-            System.out.println("Playlist '" + nomePlaylist + "'" + ownerInfo + " created successfully!");
+            System.out.println("Playlist '" + nomePlaylist + "' created successfully!");
         } catch (JaExisteException e) {
-            System.out.println("Error: A playlist with that name already exists.");
+            System.out.println("Error: A playlist with that name already exists."); // Should have been caught by existePlaylist check
         }
     }
 
@@ -467,7 +514,7 @@ public class AdminUI {
 
     public void viewAllAlbums() {
         System.out.println("\n--- All Albums ---");
-        Map<String, Album> albums = modelData.getMapAlbums();
+        Map<String, Album> albums = modelData.getMapAlbumsCopy();
 
         if (albums.isEmpty()) {
             System.out.println("No albums found in the system.");

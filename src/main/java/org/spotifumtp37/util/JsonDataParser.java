@@ -118,7 +118,7 @@ public class JsonDataParser {
 
         // Save albums
         try (FileWriter writer = new FileWriter(new File(directory, ALBUMS_FILE))) {
-            gson.toJson(data.getMapAlbums(), writer);
+            gson.toJson(data.getMapAlbumsCopy(), writer);
         }
 
         // Save playlists

@@ -12,10 +12,7 @@ import org.spotifumtp37.model.subscription.PremiumTop;
 import org.spotifumtp37.model.user.User;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class UserUI {
     private final Scanner scanner;
@@ -64,7 +61,7 @@ public class UserUI {
 
         musicSelectionMenu.setHandler(1, this::showPlayFromPlaylistSelectionMenu);
         musicSelectionMenu.setHandler(2, this::showPlayFromAlbumSelectionMenu);
-        // musicSelectionMenu.setHandler(3, this::playFreePlaylist); // To be implemented later
+        musicSelectionMenu.setHandler(3, this::playFreePlaylist); // To be implemented later
 
         musicSelectionMenu.run();
     }
@@ -77,7 +74,6 @@ public class UserUI {
 
         playFromPlaylistMenu.setHandler(1, this::viewAllPlaylistsForPlaying);
         playFromPlaylistMenu.setHandler(2, this::playFromSpecificPlaylist);
-        // Add pre-conditions if necessary
 
         playFromPlaylistMenu.run();
     }
@@ -90,7 +86,6 @@ public class UserUI {
 
         playFromAlbumMenu.setHandler(1, this::viewAllAlbumsForPlaying);
         playFromAlbumMenu.setHandler(2, this::playFromSpecificAlbum);
-        // Add pre-conditions if necessary
 
         playFromAlbumMenu.run();
     }
@@ -107,7 +102,6 @@ public class UserUI {
 
     private void playFromSpecificPlaylist() {
         System.out.println("Enter the name of the playlist to play: ");
-        scanner.nextLine(); // Consume leftover newline
         String playlistName = scanner.nextLine().trim();
         try {
             Playlist playlist = modelData.getAnyPlaylist(playlistName, loggedUser);
@@ -129,7 +123,7 @@ public class UserUI {
 
     private void viewAllAlbumsForPlaying() {
         System.out.println("Available Albums:");
-        this.modelData.getMapAlbums().forEach((title, album) -> {
+        this.modelData.getMapAlbumsCopy().forEach((title, album) -> {
             System.out.println("- " + title + " by " + album.getArtist());
         });
         System.out.println("--- End of Album List ---");
@@ -154,6 +148,31 @@ public class UserUI {
             }
         } catch (NaoExisteException e) {
             System.out.println("Album not found.");
+        }
+    }
+
+    private void playFreePlaylist() {
+        List<Song> allAvailableSongs = new ArrayList<>();
+        // Aggregate ALL songs from all albums
+        for (Album album : modelData.getMapAlbums().values()) {
+            allAvailableSongs.addAll(album.getSongs());
+        }
+
+        if (allAvailableSongs.isEmpty()) {
+            System.out.println("No songs available to play.");
+            return;
+        }
+        // Shuffle the songs
+        Collections.shuffle(allAvailableSongs);
+
+        // Create a temporary Playlist object
+        Playlist tempPlaylist = new Playlist(this.loggedUser, "FreeShuffle", "", 0 , "", allAvailableSongs);
+
+        // Play with PlayerUI (using your existing playSong(Playlist, User) method)
+        try {
+            playerUI.playSong(tempPlaylist, loggedUser);
+        } catch (IOException e) {
+            System.out.println("Error playing songs: " + e.getMessage());
         }
     }
 
@@ -186,11 +205,9 @@ public class UserUI {
                 "PremiumTop"
         });
 
-        changeSubscriptionMenu.setPreCondition(1, () -> !this.loggedUser.getSubscriptionPlan().equals(new FreePlan()));
-
-        changeSubscriptionMenu.setPreCondition(2, () -> !this.loggedUser.getSubscriptionPlan().equals(new PremiumBase()));
-
-        changeSubscriptionMenu.setPreCondition(3, () -> !this.loggedUser.getSubscriptionPlan().equals(new PremiumTop()));
+        changeSubscriptionMenu.setPreCondition(1, () -> !(this.loggedUser.getSubscriptionPlan() instanceof FreePlan));
+        changeSubscriptionMenu.setPreCondition(2, () -> !(this.loggedUser.getSubscriptionPlan() instanceof PremiumBase));
+        changeSubscriptionMenu.setPreCondition(3, () -> !(this.loggedUser.getSubscriptionPlan() instanceof PremiumTop));
 
         changeSubscriptionMenu.setHandler(1, this::alteraSubscriptionFreePlan);
         changeSubscriptionMenu.setHandler(2, this::alteraSubscriptionPremiumBasePlan);
@@ -476,7 +493,7 @@ public class UserUI {
         String newEmail;
         System.out.print("Enter your new Email: ");
         newEmail = scanner.nextLine().trim();
-        while (!newEmail.contains("@")) { // Basic email validation
+        while (!newEmail.contains("@")) {
             System.out.print("Please enter a valid email address: ");
             newEmail = scanner.nextLine().trim();
         }
