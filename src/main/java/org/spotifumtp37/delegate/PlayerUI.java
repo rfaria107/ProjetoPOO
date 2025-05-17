@@ -44,6 +44,7 @@ public class PlayerUI {
             System.out.print("n=next, ");
             if (user.getSubscriptionPlan().canBrowsePlaylist()) {
                 System.out.print("p=prev, ");
+                System.out.print("r=shuffle random song, ");
             }
             System.out.print("s=stop\n");
             boolean waitingForInput = true;
@@ -56,6 +57,11 @@ public class PlayerUI {
                     case 'n': // next
                         playable.next(user);
                         System.out.println("Skipping to next...");
+                        waitingForInput = false;
+                        break;
+                    case 'r': // nextshuffle (para users premium darem shuffle)
+                        playable.nextShuffle();
+                        System.out.println("Skipping to next on shuffle mode...");
                         waitingForInput = false;
                         break;
                     case 'p': // prev

@@ -177,6 +177,17 @@ public class Album implements Playable, Serializable {
         }
     }
 
+    public void nextShuffle() {
+        if (songs.size() == 1) return;
+        Random rand = new Random();
+        int currentIndex = songs.indexOf(currentSong);
+        int randomIndex;
+        do {
+            randomIndex = rand.nextInt(songs.size());
+        } while (randomIndex == currentIndex);
+        currentSong = songs.get(randomIndex);
+    }
+
     @Override
     public void previous(User user) throws SubscriptionDoesNotAllowException {
         if (user.getSubscriptionPlan().canBrowsePlaylist()) {

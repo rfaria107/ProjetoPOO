@@ -24,8 +24,8 @@ public class Song implements Serializable {
         this.timesPlayed = 0;
     }
 
-    Song(String name, String artist, String publisher, String lyrics,
-         String musicalNotes, String genre, int durationInSeconds) {
+    public Song(String name, String artist, String publisher, String lyrics,
+                String musicalNotes, String genre, int durationInSeconds) {
         this.name = name;
         this.artist = artist;
         this.publisher = publisher;

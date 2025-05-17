@@ -105,7 +105,7 @@ public class User implements Serializable {
     }
 
     public void setHistory(List<History> history) {
-        this.history = new ArrayList<>(history);
+        this.history = new ArrayList<>();
         for (History h : history) {
             this.history.add(h.clone());
         }

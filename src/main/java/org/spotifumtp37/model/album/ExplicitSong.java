@@ -10,7 +10,7 @@ public class ExplicitSong extends Song implements Serializable {
         this.explicit = other.isExplicit();
     }
 
-    ExplicitSong(String name, String artist, String publisher, String lyrics, String musicalNotes, String genre, int durationInSeconds) {
+    public ExplicitSong(String name, String artist, String publisher, String lyrics, String musicalNotes, String genre, int durationInSeconds) {
         super(name, artist, publisher, lyrics, musicalNotes, genre, durationInSeconds);
         this.explicit = true;
     }

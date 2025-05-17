@@ -9,6 +9,8 @@ import java.io.Serializable;
 public interface Playable extends Serializable {
     void next(User user);
 
+    void nextShuffle();
+
     void previous(User user) throws SubscriptionDoesNotAllowException;
 
     void play(User user);

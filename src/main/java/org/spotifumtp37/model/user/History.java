@@ -20,13 +20,13 @@ public class History implements Serializable {
         this.song = null;
     }
 
-    public History(History history) {
-        this.song = history.song;
-        this.time = history.time;
+    public History(History other) {
+        this.song = other.song != null ? other.song.clone() : null;
+        this.time = other.getTime();
     }
 
     public LocalDateTime getTime() {
-        return time;
+        return this.time;
     }
 
     public void setTime(LocalDateTime time) {
@@ -34,10 +34,11 @@ public class History implements Serializable {
     }
 
     public Song getSong() {
-        return song;
+        return this.song != null ? this.song.clone() : null;
     }
 
     public void setSong(Song song) {
+        // Store the reference, not a deep copy
         this.song = song;
     }
 
@@ -54,6 +55,11 @@ public class History implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         History history = (History) o;
         return Objects.equals(song, history.song) && Objects.equals(time, history.time);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(song, time);
     }
 
     @Override
