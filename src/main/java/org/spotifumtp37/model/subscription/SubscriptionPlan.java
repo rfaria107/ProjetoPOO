@@ -9,5 +9,5 @@ public interface SubscriptionPlan extends Serializable {
 
     boolean canBrowsePlaylist();
 
-    boolean canAcessFavouritesList();
+    boolean canAccessFavouritesList();
 }

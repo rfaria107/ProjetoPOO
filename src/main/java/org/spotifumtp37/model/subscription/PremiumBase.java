@@ -19,7 +19,7 @@ public class PremiumBase implements Serializable, SubscriptionPlan {
     }
 
     @Override
-    public boolean canAcessFavouritesList() {
+    public boolean canAccessFavouritesList() {
         return false;
     }
 }

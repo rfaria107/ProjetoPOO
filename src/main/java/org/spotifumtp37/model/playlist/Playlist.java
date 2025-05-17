@@ -1,6 +1,7 @@
 package org.spotifumtp37.model.playlist;
 
 import org.spotifumtp37.model.album.Song;
+import org.spotifumtp37.model.exceptions.SubscriptionDoesNotAllowException;
 import org.spotifumtp37.model.user.User;
 
 import java.io.Serializable;
@@ -148,43 +149,55 @@ public class Playlist implements Serializable, Playable {
     @Override
     public void play(User user) {
         this.currentSong.incrementTimesPlayed();
-        user.somarPontos();
+        user.addPoints();
         user.updateHistory(this.currentSong);
     }
 
     @Override
     public void next(User user) {
-        if (user.getSubscriptionPlan().canBrowsePlaylist()) {
-            currentSong = songs.get((songs.indexOf(currentSong) + 1) % songs.size());
-        } else {
-            Random rand = new Random();
-            int randomIndex = rand.nextInt(songs.size() - 1);
-            while (randomIndex == songs.indexOf(currentSong)) {
-                randomIndex = rand.nextInt(songs.size() - 1);
-            }
-            currentSong = songs.get(randomIndex);
-        }
+
+    if (user.getSubscriptionPlan().canBrowsePlaylist()) {
+        int index = songs.indexOf(currentSong);
+        int nextIndex = (index + 1) % songs.size();
+        currentSong = songs.get(nextIndex);
+    } else {
+        if (songs.size() == 1) return;
+        Random rand = new Random();
+        int currentIndex = songs.indexOf(currentSong);
+        int randomIndex;
+        do {
+            randomIndex = rand.nextInt(songs.size());
+        } while (randomIndex == currentIndex);
+        currentSong = songs.get(randomIndex);
     }
+}
 
     public void nextShuffle() {
+        if (songs.size() == 1) return;
         Random rand = new Random();
-        int randomIndex = rand.nextInt(songs.size() - 1);
-        while (randomIndex == songs.indexOf(currentSong)) {
-            randomIndex = rand.nextInt(songs.size() - 1);
-        }
+        int currentIndex = songs.indexOf(currentSong);
+        int randomIndex;
+        do {
+            randomIndex = rand.nextInt(songs.size());
+        } while (randomIndex == currentIndex);
         currentSong = songs.get(randomIndex);
     }
 
     @Override
-    public void previous(User user) {
+    public void previous(User user) throws SubscriptionDoesNotAllowException {
+        if (songs.isEmpty()) return;
+
         if (user.getSubscriptionPlan().canBrowsePlaylist()) {
-            currentSong = songs.get((songs.indexOf(currentSong) - 1 + songs.size() - 1) % songs.size() - 1);
+            int index = songs.indexOf(currentSong);
+            int prevIndex = (index - 1 + songs.size()) % songs.size();
+            currentSong = songs.get(prevIndex);
         } else {
-            throw new UnsupportedOperationException("Your subscription does not allow going back in the playlist.");
+            throw new SubscriptionDoesNotAllowException("Your subscription does not allow going back in the playlist.");
         }
     }
 
-    public void addSong(Song song) {
+
+    public void addSong(Song song) throws SubscriptionDoesNotAllowException {
         if (creator.getSubscriptionPlan().canCreatePlaylist()) {
             if (!songs.contains(song)) {
                 songs.add(song);
@@ -192,11 +205,11 @@ public class Playlist implements Serializable, Playable {
                 throw new UnsupportedOperationException("This song is already in the playlist.");
             }
         } else {
-            throw new UnsupportedOperationException("Your subscription does not allow adding songs to the playlist.");
+            throw new SubscriptionDoesNotAllowException("Your subscription does not allow adding songs to the playlist.");
         }
     }
 
-    public void deleteSong(Song song) {
+    public void deleteSong(Song song) throws SubscriptionDoesNotAllowException {
         if (creator.getSubscriptionPlan().canCreatePlaylist()) {
             if (songs.contains(song)) {
                 songs.remove(song);
@@ -204,7 +217,7 @@ public class Playlist implements Serializable, Playable {
                 throw new UnsupportedOperationException("This song is not in the playlist.");
             }
         } else {
-            throw new UnsupportedOperationException("Your subscription does not allow deleting songs from the playlist.");
+            throw new SubscriptionDoesNotAllowException("Your subscription does not allow deleting songs from the playlist.");
         }
     }
 }

@@ -1,7 +1,5 @@
 package org.spotifumtp37.model.album;
 
-import org.spotifumtp37.model.playlist.Playlist;
-
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -159,4 +157,12 @@ public class Song implements Serializable {
                 ", timesPlayed=" + timesPlayed +
                 '}';
     }
+
+    public boolean isExplicit() {
+        return false;
+    }
+    public boolean isMultimedia() {
+        return false;
+    }
+
 }

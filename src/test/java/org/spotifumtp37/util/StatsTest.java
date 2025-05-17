@@ -23,14 +23,14 @@ class StatsTest {
     }
 
     @Test
-    void generoMaisReproduzido() {
+    void mostListenedGenre() {
     }
 
     @Test
-    void contarPlaylistsPublicas() {
+    void countPublicPlaylists() {
     }
 
     @Test
-    void utilizadorComMaisPlaylists() {
+    void userWithMostPlaylists() {
     }
 }

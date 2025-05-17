@@ -1,8 +1,8 @@
 package org.spotifumtp37.delegate;
 
 import org.spotifumtp37.model.SpotifUMData;
-import org.spotifumtp37.model.exceptions.JaExisteException;
-import org.spotifumtp37.model.exceptions.NaoExisteException;
+import org.spotifumtp37.model.exceptions.AlreadyExistsException;
+import org.spotifumtp37.model.exceptions.DoesntExistException;
 import org.spotifumtp37.model.subscription.FreePlan;
 import org.spotifumtp37.model.user.User;
 
@@ -57,7 +57,7 @@ public class SpotifUMUI {
             System.out.println("Login successful! Redirecting to User Menu...");
             loggedUser = this.modelData.getCurrentUserPointer(username);
             userUI.setLoggedUser(loggedUser);
-            userUI.showUserMenu(); // Show user menu
+            userUI.showUserMenu();
         } else {
             System.out.println("Invalid credentials for User!");
         }
@@ -99,16 +99,16 @@ public class SpotifUMUI {
     public boolean registerNewUser(String username, String password, String email, String address) {
         User user = new User(username, email, address, new FreePlan(), password, 0, new ArrayList<>());
         try {
-            modelData.adicionaUser(user);
+            modelData.addUser(user);
             return true;
-        } catch (JaExisteException e) {
+        } catch (AlreadyExistsException e) {
             return false;
         }
     }
 
     public void loginAsAdmin() {
         System.out.println("Redirecting to Admin Menu...");
-        adminUI.showAdminMenu(); // Show admin menu
+        adminUI.showAdminMenu();
     }
 
     public boolean authenticateUser(String username, String password) {
@@ -118,7 +118,7 @@ public class SpotifUMUI {
         try {
             User user = modelData.getUser(username);
             return password.equals(user.getPassword());
-        } catch (NaoExisteException e) {
+        } catch (DoesntExistException e) {
             return false;
         }
     }

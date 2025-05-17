@@ -3,8 +3,9 @@ package org.spotifumtp37.delegate;
 import org.spotifumtp37.model.SpotifUMData;
 import org.spotifumtp37.model.album.Album;
 import org.spotifumtp37.model.album.Song;
-import org.spotifumtp37.model.exceptions.JaExisteException;
-import org.spotifumtp37.model.exceptions.NaoExisteException;
+import org.spotifumtp37.model.exceptions.AlreadyExistsException;
+import org.spotifumtp37.model.exceptions.DoesntExistException;
+import org.spotifumtp37.model.exceptions.SubscriptionDoesNotAllowException;
 import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.subscription.FreePlan;
 import org.spotifumtp37.model.subscription.PremiumBase;
@@ -28,7 +29,7 @@ public class UserUI {
         this.loggedUser = loggedUser;
         this.modelData = modelData;
         this.scanner = scanner;
-        this.playerUI = new PlayerUI(scanner, modelData); // Initialize PlayerUI
+        this.playerUI = new PlayerUI(scanner); // Initialize PlayerUI
     }
 
     public void showUserMenu() {
@@ -116,16 +117,14 @@ public class UserUI {
                     System.out.println("Error playing playlist. Please try again later." + e.getMessage());
                 }
             }
-        } catch (NaoExisteException e) {
+        } catch (DoesntExistException e) {
             System.out.println("Playlist not found or not accessible." + e.getMessage());
         }
     }
 
     private void viewAllAlbumsForPlaying() {
         System.out.println("Available Albums:");
-        this.modelData.getMapAlbumsCopy().forEach((title, album) -> {
-            System.out.println("- " + title + " by " + album.getArtist());
-        });
+        this.modelData.getMapAlbumsCopy().forEach((title, album) -> System.out.println("- " + title + " by " + album.getArtist()));
         System.out.println("--- End of Album List ---");
     }
 
@@ -146,7 +145,7 @@ public class UserUI {
                     System.out.println("Error playing playlist. Please try again later." + e.getMessage());
                 }
             }
-        } catch (NaoExisteException e) {
+        } catch (DoesntExistException e) {
             System.out.println("Album not found.");
         }
     }
@@ -187,15 +186,114 @@ public class UserUI {
 
         userPlaylistMenu.setPreCondition(1, () -> this.loggedUser.getSubscriptionPlan().canCreatePlaylist());
         userPlaylistMenu.setPreCondition(2, () -> this.loggedUser.getSubscriptionPlan().canCreatePlaylist());
-        userPlaylistMenu.setPreCondition(3, () -> this.loggedUser.getSubscriptionPlan().canAcessFavouritesList());
+        userPlaylistMenu.setPreCondition(3, () -> this.loggedUser.getSubscriptionPlan().canAccessFavouritesList());
         userPlaylistMenu.setPreCondition(5, () -> this.loggedUser.getSubscriptionPlan().canCreatePlaylist());
 
         userPlaylistMenu.setHandler(1, this::createPlaylist);
         userPlaylistMenu.setHandler(2, this::addSongToPlaylist);
+        userPlaylistMenu.setHandler(3, this::showRecommendedPlaylistMenu);
         userPlaylistMenu.setHandler(4, this::viewUserPlaylists);
         userPlaylistMenu.setHandler(5, this::deletePlaylist);
 
         userPlaylistMenu.run();
+    }
+
+    public void showRecommendedPlaylistMenu() {
+        NewMenu recommendedMenu = new NewMenu(new String[]{
+                "Create Top Genre Playlist",
+                "Create Top Genre Playlist With Max Time",
+                "Create Top Genre Playlist With Only Explicit Songs"
+        });
+
+        // Set up handlers for recommended playlist options
+        recommendedMenu.setHandler(1, this::createTopGenrePlaylist);
+        recommendedMenu.setHandler(2, this::createTopGenrePlaylistWithMaxTime);
+        recommendedMenu.setHandler(3, this::createTopGenrePlaylistWithExplicitOnly);
+
+        recommendedMenu.run();
+    }
+
+    private void createTopGenrePlaylist() {
+        System.out.println("Creating a top genre playlist...");
+        Map<String, Album> albumMap = modelData.getMapAlbums();
+
+        List<Song> songs = loggedUser.createTopGenrePlaylist(albumMap);
+        if (songs.isEmpty()) {
+            System.out.println("Could not create a playlist: No top genre found or no songs for your top genre.");
+            return;
+        }
+
+        System.out.print("Enter name for the new playlist: ");
+        String playlistName = scanner.nextLine();
+
+        String playlistDescription = "Top genre playlist created automatically for " + this.loggedUser.getName() + ".";
+        String status = "private";
+        Playlist playlist = new Playlist(this.loggedUser,playlistName,playlistDescription,0, status,  songs);
+        try {modelData.addPlaylist(playlist);
+        } catch (AlreadyExistsException e) {
+            System.out.println("Error: A playlist with that name already exists." + e.getMessage());
+            return;
+        }
+        System.out.println("Playlist '" + playlistName + "' created with " + songs.size() + " songs.");
+    }
+
+    private void createTopGenrePlaylistWithMaxTime() {
+        System.out.println("Creating a top genre playlist with a maximum total duration...");
+        Map<String, Album> albumMap = modelData.getMapAlbums();
+
+        System.out.print("Enter the maximum total duration (in minutes) for the playlist: ");
+        int maxTime;
+        try {
+            maxTime = Integer.parseInt(scanner.nextLine());
+            maxTime *= 60;//convert to seconds
+        } catch (NumberFormatException ex) {
+            System.out.println("Invalid number input.");
+            return;
+        }
+
+        List<Song> songs = loggedUser.createTopGenrePlaylistWithinTime(albumMap, maxTime);
+        if (songs.isEmpty()) {
+            System.out.println("Could not create a playlist: No top genre found or no songs for your top genre.");
+            return;
+        }
+
+        System.out.print("Enter name for the new playlist: ");
+        String playlistName = scanner.nextLine();
+
+        String playlistDescription = "Top genre playlist created automatically for " + this.loggedUser.getName() + ".";
+        String status = "private";
+
+        Playlist playlist = new Playlist(this.loggedUser,playlistName,playlistDescription,0, status,  songs);
+        try {modelData.addPlaylist(playlist);
+        } catch (AlreadyExistsException e) {
+            System.out.println("Error: A playlist with that name already exists." + e.getMessage());
+            return;
+        }
+        System.out.println("Playlist '" + playlistName + "' created with " + songs.size() + " songs.");
+    }
+
+    private void createTopGenrePlaylistWithExplicitOnly() {
+        System.out.println("Creating a top genre playlist with only explicit songs...");
+        Map<String, Album> albumMap = modelData.getMapAlbums();
+
+        List<Song> songs = loggedUser.createTopGenreExplicitPlaylist(albumMap);
+        if (songs.isEmpty()) {
+            System.out.println("Could not create a playlist: No top genre found or no songs for your top genre.");
+            return;
+        }
+
+        System.out.print("Enter name for the new playlist: ");
+        String playlistName = scanner.nextLine();
+
+        String playlistDescription = "Top genre playlist created automatically for " + this.loggedUser.getName() + ".";
+        String status = "private";
+        Playlist playlist = new Playlist(this.loggedUser,playlistName,playlistDescription,0, status,  songs);
+        try {modelData.addPlaylist(playlist);
+        } catch (AlreadyExistsException e) {
+            System.out.println("Error: A playlist with that name already exists." + e.getMessage());
+            return;
+        }
+        System.out.println("Playlist '" + playlistName + "' created with " + songs.size() + " songs.");
     }
 
     private void showChangeSubscriptionMenu() {
@@ -226,7 +324,7 @@ public class UserUI {
 
         userEditMenu.setHandler(1, this::changePassword);
         userEditMenu.setHandler(2, this::changeEmail);
-        userEditMenu.setHandler(3, this::changeAdress);
+        userEditMenu.setHandler(3, this::changeAddress);
         userEditMenu.run();
     }
 
@@ -257,11 +355,11 @@ public class UserUI {
 
         System.out.println("Create New Playlist");
         String playlistName;
-        scanner.nextLine(); // Consume the leftover newline
+        scanner.nextLine();
         System.out.println("Enter the name for your new playlist: ");
         playlistName = scanner.nextLine().trim();
 
-        while (this.modelData.existePlaylist(playlistName)) {
+        while (this.modelData.existsPlaylist(playlistName)) {
             System.out.println("A playlist with this name already exists. Please choose another name: ");
             playlistName = scanner.nextLine().trim();
         }
@@ -306,21 +404,21 @@ public class UserUI {
                 try {
                     Album album = this.modelData.getAlbum(nomeAlbum);
                     System.out.println("Songs in album '" + album.getTitle() + "':");
-                    album.getSongsCopy().forEach(song -> System.out.println("- " + song.getName())); // Use getTitulo
+                    album.getSongsCopy().forEach(song -> System.out.println("- " + song.getName()));
                     while (true) {
                         System.out.println("Type the name of the song you want to add to the playlist: ");
-                        String nomeMusica = scanner.nextLine().trim();
+                        String musicName = scanner.nextLine().trim();
                         try {
-                            songs.add(this.modelData.getSong(nomeMusica, nomeAlbum));
-                            System.out.println("Song '" + nomeMusica + "' added to playlist");
+                            songs.add(this.modelData.getSong(musicName, nomeAlbum));
+                            System.out.println("Song '" + musicName + "' added to playlist");
                             break;
-                        } catch (NaoExisteException e) {
+                        } catch (DoesntExistException e) {
                             System.out.println("Incorrect song name, does not exist in album '" + nomeAlbum + "'. Try again.");
                         }
                     }
                     break;
 
-                } catch (NaoExisteException e) {
+                } catch (DoesntExistException e) {
                     System.out.println("Incorrect album name, does not exist. Try again.");
                 }
             }
@@ -331,8 +429,8 @@ public class UserUI {
         try {
             this.modelData.addPlaylist(playlist);
             System.out.println("Playlist '" + playlistName + "' created successfully!");
-        } catch (JaExisteException e) {
-            System.out.println("Error: A playlist with that name already exists."); // Should have been caught by existePlaylist check
+        } catch (AlreadyExistsException e) {
+            System.out.println("Error: A playlist with that name already exists.");
         }
     }
 
@@ -344,7 +442,7 @@ public class UserUI {
         scanner.nextLine(); // Consume leftover newline if any
         nomePlaylist = scanner.nextLine().trim();
 
-        while (!this.modelData.existePlaylist(nomePlaylist)) {
+        while (!this.modelData.existsPlaylist(nomePlaylist)) {
             System.out.println("Playlist does not exist. Enter another name or type 'exit' to cancel: ");
             nomePlaylist = scanner.nextLine().trim();
             if (nomePlaylist.equalsIgnoreCase("exit")) {
@@ -359,7 +457,7 @@ public class UserUI {
                 System.out.println("You can only add songs to your own playlists.");
                 return;
             }
-        } catch (NaoExisteException e) {
+        } catch (DoesntExistException e) {
             System.out.println("Error: Playlist not found or you do not have permission.");
             return;
         }
@@ -376,26 +474,27 @@ public class UserUI {
             try {
                 Album album = this.modelData.getAlbum(nomeAlbum);
                 System.out.println("Songs in album '" + album.getTitle() + "':");
-                album.getSongsCopy().forEach(song -> System.out.println("- " + song.getName())); // Use getTitulo
+                album.getSongsCopy().forEach(song -> System.out.println("- " + song.getName()));
 
                 while (true) {
                     System.out.println("Choose the song you want to add to the playlist '" + playlist.getPlaylistName() + "':");
-                    String nomeMusica = scanner.nextLine().trim();
+                    String musicName = scanner.nextLine().trim();
                     try {
-                        Song added = this.modelData.getSong(nomeMusica, nomeAlbum);
-                        if (playlist.getSongs().contains(added)) { // Check if song is already in playlist
+                        Song added = this.modelData.getSong(musicName, nomeAlbum);
+                        if (playlist.getSongs().contains(added)) {
                             System.out.println("Song already in playlist, try again.");
-                            // No need to re-prompt for nomeMusica here, loop will do it
                         } else {
                             playlist.addSong(added);
                             System.out.println("Song '" + added.getName() + "' added to playlist '" + playlist.getPlaylistName() + "'.");
-                            return; // Exit after successfully adding a song
+                            return;
                         }
-                    } catch (NaoExisteException e) {
+                    } catch (DoesntExistException e) {
                         System.out.println("Incorrect song name, does not exist in album '" + nomeAlbum + "'. Try again.");
+                    } catch (SubscriptionDoesNotAllowException e) {
+                        System.out.println("Your current subscription plan doesn't allow adding songs to playlists." + e.getMessage());
                     }
                 }
-            } catch (NaoExisteException e) {
+            } catch (DoesntExistException e) {
                 System.out.println("Incorrect album name, does not exist. Try again.");
             }
         }
@@ -418,7 +517,7 @@ public class UserUI {
         scanner.nextLine(); // consume leftover newline
         String name = scanner.nextLine().trim();
 
-        if (!modelData.existePlaylist(name)) {
+        if (!modelData.existsPlaylist(name)) {
             System.out.print("Playlist not found. Cannot delete.");
             return;
         }
@@ -430,16 +529,14 @@ public class UserUI {
             }
             this.modelData.removePlaylist(name);
             System.out.println("Playlist '" + name + "' deleted successfully!");
-        } catch (NaoExisteException e) {
-            // This case should ideally be covered by existePlaylist,
-            // but good to have for robustness if getPlaylist has stricter access.
+        } catch (DoesntExistException e) {
             System.out.println("Error: Playlist not found or you don't have permission to delete it.");
         }
     }
 
     public void changePassword() {
         String loggedUserPassword = this.loggedUser.getPassword();
-        scanner.nextLine(); // Consume leftover newline
+        scanner.nextLine();
 
         String currentPassword;
         while (true) {
@@ -504,15 +601,15 @@ public class UserUI {
 
     }
 
-    public void changeAdress() {
-        String loggedUserAdress = this.loggedUser.getAddress();
+    public void changeAddress() {
+        String loggedUserAddress = this.loggedUser.getAddress();
         scanner.nextLine(); // Consume leftover newline
 
-        String currentAdress;
+        String currentAddress;
         while (true) {
             System.out.print("Enter your current Address: ");
-            currentAdress = scanner.nextLine().trim();
-            if (currentAdress.equals(loggedUserAdress)) {
+            currentAddress = scanner.nextLine().trim();
+            if (currentAddress.equals(loggedUserAddress)) {
                 break;
             }
             System.out.println("Incorrect Address. Please try again.");

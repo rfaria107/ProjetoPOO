@@ -1,7 +1,9 @@
 package org.spotifumtp37.delegate;
 
 import org.spotifumtp37.model.SpotifUMData;
+import org.spotifumtp37.model.album.MultimediaSong;
 import org.spotifumtp37.model.album.Song;
+import org.spotifumtp37.model.exceptions.SubscriptionDoesNotAllowException;
 import org.spotifumtp37.model.playlist.Playable;
 import org.spotifumtp37.model.user.User;
 
@@ -11,15 +13,13 @@ import java.io.IOException;
 public class PlayerUI {
 
     private final Scanner scanner;
-    private final SpotifUMData modelData;
 
-    public PlayerUI(Scanner scanner, SpotifUMData modelData) {
+    public PlayerUI(Scanner scanner) {
         this.scanner = scanner;
-        this.modelData = modelData;
     }
 
     /**
-     * Play a playable: shows lyrics and reacts to next/prev/stop.
+     * Play a "playable": shows lyrics and reacts to next/prev/stop.
      */
     public void playSong(Playable playable, User user) throws IOException {
         boolean continuePlaying = true;
@@ -30,11 +30,22 @@ public class PlayerUI {
 
             Song song = playable.getCurrentSong();
             System.out.printf("Now playing \"%s\" by %s%n", song.getName(), song.getArtist());
+            if (song.isExplicit()) {
+                System.out.println("Warning: This is an explicit song!");
+            }
 
+            if (song.isMultimedia()) {
+                System.out.println("This song has a music video!");
+                System.out.println("You can watch it at" + ((MultimediaSong) song).getVideoLink());
+            }
 
             System.out.println("Lyrics:\n" + song.getLyrics());
-            System.out.println("\nControls: n=next, p=prev, s=stop");
-
+            System.out.println("\nControls: ");
+            System.out.print("n=next, ");
+            if (user.getSubscriptionPlan().canBrowsePlaylist()) {
+                System.out.print("p=prev, ");
+            }
+            System.out.print("s=stop");
             boolean waitingForInput = true;
             while (waitingForInput) {
                 System.out.print("Command: ");
@@ -51,8 +62,8 @@ public class PlayerUI {
                         try {
                             playable.previous(user);
                             System.out.println("Going to previous...");
-                        } catch (UnsupportedOperationException e) {
-                            System.out.println("Cannot go back.");
+                        } catch (SubscriptionDoesNotAllowException e) {
+                            System.out.println("Cannot go back." + e.getMessage());
                         }
                         waitingForInput = false;
                         break;

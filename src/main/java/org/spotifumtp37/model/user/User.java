@@ -1,18 +1,16 @@
 package org.spotifumtp37.model.user;
 
+import org.spotifumtp37.model.album.Album;
 import org.spotifumtp37.model.album.Song;
 import org.spotifumtp37.model.subscription.FreePlan;
-import org.spotifumtp37.model.subscription.PremiumBase;
 import org.spotifumtp37.model.subscription.PremiumTop;
 import org.spotifumtp37.model.subscription.SubscriptionPlan;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class User implements Serializable {
     private String name;
@@ -129,9 +127,9 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public void somarPontos() {
-        double newPontos = subscriptionplan.addPoints(pontos); // Get the new points from the plan
-        setPontos(newPontos);
+    public void addPoints() {
+        double newPoints = subscriptionplan.addPoints(pontos); // Get the new points from the plan
+        setPontos(newPoints);
     }
 
     public User clone() {
@@ -141,10 +139,6 @@ public class User implements Serializable {
     public void updatePremiumTop(PremiumTop newPlan) {
         this.setSubscriptionPlan(newPlan);
         this.pontos += 100;
-    }
-
-    public void updateFreePlan(FreePlan newPlan) {
-        this.setSubscriptionPlan(newPlan);
     }
 
     public void updateHistory(Song song) {
@@ -161,7 +155,7 @@ public class User implements Serializable {
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", address='" + address + '\'' +
-                ", subscriptionplan=" + subscriptionplan +
+                ", subscription plan=" + subscriptionplan +
                 ", password='" + password + '\'' +
                 ", pontos=" + pontos +
                 ", history=" + history +
@@ -174,6 +168,77 @@ public class User implements Serializable {
         User user = (User) o;
         return Objects.equals(name, user.name); // Compare by name
     }
+
+    public String getTopGenre() {
+        if (history == null || history.isEmpty()) return null;
+
+        Map<String, Integer> genreCount = new HashMap<>();
+        for (History h : history) {
+            Song song = h.getSong();
+            if (song != null && song.getGenre() != null) {
+                String genre = song.getGenre();
+                genreCount.put(genre, genreCount.getOrDefault(genre, 0) + 1);
+            }
+        }
+        return genreCount.entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+    }
+
+    public List<Song> createTopGenrePlaylist(Map<String, Album> albumMap) {
+        String topGenre = getTopGenre();
+        if (topGenre == null || albumMap == null) return Collections.emptyList();
+
+        List<Song> result = new ArrayList<>();
+        for (Album album : albumMap.values()) {
+            for (Song song : album.getSongs()) {
+                if (topGenre.equals(song.getGenre())) {
+                    result.add(song);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<Song> createTopGenrePlaylistWithinTime(Map<String, Album> albumMap, int maxTime) {
+        String topGenre = getTopGenre();
+        if (topGenre == null || albumMap == null) return Collections.emptyList();
+
+        int totalTime = 0;
+        List<Song> playlist = new ArrayList<>();
+        outer:
+        for (Album album : albumMap.values()) {
+            for (Song song : album.getSongs()) {
+                if (topGenre.equals(song.getGenre())) {
+                    int songTime = song.getDurationInSeconds();
+                    if (totalTime + songTime > maxTime) break outer;
+                    playlist.add(song);
+                    totalTime += songTime;
+                }
+            }
+        }
+        return playlist;
+    }
+
+    public List<Song> createTopGenreExplicitPlaylist(Map<String, Album> albumMap) {
+        String topGenre = getTopGenre();
+        if (topGenre == null || albumMap == null) return Collections.emptyList();
+
+        List<Song> result = new ArrayList<>();
+        for (Album album : albumMap.values()) {
+            for (Song song : album.getSongs()) {
+                if (topGenre.equals(song.getGenre()) && song.isExplicit()) {
+                    result.add(song);
+                }
+            }
+        }
+        return result;
+    }
+
+
+
 
 
 }

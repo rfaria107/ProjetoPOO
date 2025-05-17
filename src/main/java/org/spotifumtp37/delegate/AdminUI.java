@@ -3,8 +3,8 @@ package org.spotifumtp37.delegate;
 import org.spotifumtp37.model.SpotifUMData;
 import org.spotifumtp37.model.album.Album;
 import org.spotifumtp37.model.album.Song;
-import org.spotifumtp37.model.exceptions.JaExisteException;
-import org.spotifumtp37.model.exceptions.NaoExisteException;
+import org.spotifumtp37.model.exceptions.AlreadyExistsException;
+import org.spotifumtp37.model.exceptions.DoesntExistException;
 import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.user.User;
 import org.spotifumtp37.util.JsonDataParser;
@@ -12,6 +12,8 @@ import org.spotifumtp37.util.Stats;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class AdminUI {
@@ -110,14 +112,14 @@ public class AdminUI {
         NewMenu statsMenu = new NewMenu(new String[]{
                 "Get Most Played Song",
                 "Get Most Listened Artist",
-                "Get Top Listener (Most Songs Listened)",
+                "Get the all time top Listener (Most Songs Listened)",
+                "Get Top the top Listener since a given time (Most Songs Listened)",
                 "Get User With Most Points",
                 "Get Most Played Genre",
                 "Count Public Playlists",
                 "Get User Who Created Most Playlists"
         });
 
-        // Handler for "Get Most Played Song"
         statsMenu.setHandler(1, () -> {
             Song song = Stats.getMostPlayedSong(modelData.getMapAlbumsCopy());
             if (song != null) {
@@ -127,8 +129,6 @@ public class AdminUI {
                 System.out.println("No song data available or no songs played.");
             }
         });
-
-        // Handler for "Get Most Listened Artist"
         statsMenu.setHandler(2, () -> {
             String artist = Stats.getMostListenedArtist(modelData.getMapAlbumsCopy());
             if (artist != null) {
@@ -137,8 +137,6 @@ public class AdminUI {
                 System.out.println("No artist data available or no songs played.");
             }
         });
-
-        // Handler for "Get Top Listener"
         statsMenu.setHandler(3, () -> {
             User user = Stats.getTopListener(modelData.getMapUsers());
             if (user != null) {
@@ -148,9 +146,8 @@ public class AdminUI {
                 System.out.println("No user data available.");
             }
         });
-
-        // Handler for "Get User With Most Points"
-        statsMenu.setHandler(4, () -> {
+        statsMenu.setHandler(4, this::handleTopListenerFromDate);
+        statsMenu.setHandler(5, () -> {
             User user = Stats.getUserWithMostPoints(modelData.getMapUsers());
             if (user != null) {
                 System.out.println("User With Most Points: " + user.getName() +
@@ -159,10 +156,8 @@ public class AdminUI {
                 System.out.println("No user data available for points calculation.");
             }
         });
-
-        // Handler for "Get Most Played Genre"
-        statsMenu.setHandler(5, () -> {
-            String genre = Stats.generoMaisReproduzido(modelData.getMapUsers());
+        statsMenu.setHandler(6, () -> {
+            String genre = Stats.mostListenedGenre(modelData.getMapUsers());
             if (genre != null) {
                 System.out.println("Most Played Genre: " + genre);
             } else {
@@ -170,17 +165,13 @@ public class AdminUI {
             }
         });
 
-        // Handler for "Count Public Playlists"
-        statsMenu.setHandler(6, () -> {
-            // Assuming modelData has getPlaylists() returning Map<String, Playlist>
-            long count = Stats.contarPlaylistsPublicas(modelData.getMapPlaylists());
+        statsMenu.setHandler(7, () -> {
+            long count = Stats.countPublicPlaylists(modelData.getMapPlaylists());
             System.out.println("Number of Public Playlists: " + count);
         });
 
-        // Handler for "Get User Who Created Most Playlists"
-        statsMenu.setHandler(7, () -> {
-            // Assuming modelData has getPlaylists() returning Map<String, Playlist>
-            User user = Stats.utilizadorComMaisPlaylists(modelData.getMapPlaylists());
+        statsMenu.setHandler(8, () -> {
+            User user = Stats.userWithMostPlaylists(modelData.getMapPlaylists());
             if (user != null) {
                 System.out.println("User Who Created Most Playlists: " + user.getName());
             } else {
@@ -192,6 +183,27 @@ public class AdminUI {
     }
 
     //handlers
+
+    public void handleTopListenerFromDate() {
+        System.out.print("Enter start date (yyyy-MM-dd): ");
+        String input = scanner.nextLine().trim();
+        LocalDate startDate;
+        try {
+            startDate = LocalDate.parse(input);
+        } catch (DateTimeParseException ex) {
+            System.out.println("Invalid date format. Please use yyyy-MM-dd.");
+            return;
+        }
+        LocalDateTime fromDate = startDate.atStartOfDay();
+
+        User top = Stats.getTopListenerFromDate(modelData.getMapUsers(), fromDate);
+        if (top != null) {
+            System.out.println("User who listened to the most songs since " + startDate + ": " + top.getName());
+        } else {
+            System.out.println("No user history found for the given period.");
+        }
+    }
+
 
     public void saveData() {
         System.out.print("Enter file path to save: ");
@@ -276,125 +288,135 @@ public class AdminUI {
     public void createAlbum() {
         System.out.println("Admin: Create New Album");
 
-        String titulo;
+        String title;
         System.out.print("Album title: ");
-        titulo = scanner.nextLine().trim();
-        while (this.modelData.existeAlbum(titulo)) {
-            System.out.print("Já existe álbum com esse título. Informe outro: ");
-            titulo = scanner.nextLine().trim();
+        title = scanner.nextLine().trim();
+        while (this.modelData.existsAlbum(title)) {
+            System.out.print("An Album with this title already exists. Please choose another title: ");
+            title = scanner.nextLine().trim();
         }
 
-        System.out.print("Artista: ");
-        String artista = scanner.nextLine().trim();
+        System.out.print("Artist: ");
+        String artist = scanner.nextLine().trim();
 
         int ano = 0;
         do {
-            System.out.print("Ano de lançamento (ex: 1973): ");
+            System.out.print("Release Year (ex: 1973): ");
             try {
                 ano = Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.out.println("Por favor, informe um número inteiro.");
+                System.out.println("Please type an integer.");
             }
             if (ano <= 1900 || ano > LocalDate.now().getYear()) {
-                System.out.println("Por favor, informe um ano válido.");
+                System.out.println("Please type a valid year (between 1900 and today's).");
                 ano = 0;
             }
         } while (ano == 0);
 
-        System.out.print("Gênero musical: ");
-        String genero = scanner.nextLine().trim();
+        System.out.print("Genre: ");
+        String genre = scanner.nextLine().trim();
 
-        Album album = new Album(titulo, artista, ano, genero, new ArrayList<>());
+        Album album = new Album(title, artist, ano, genre, new ArrayList<>());
 
-        int nFaixas;
+        int nSongs;
         do {
-            System.out.print("Quantas faixas deseja adicionar? ");
+            System.out.print("How many songs will this album have?");
             try {
-                nFaixas = Integer.parseInt(scanner.nextLine().trim());
+                nSongs = Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                nFaixas = 0;
+                nSongs = 0;
             }
-            if (nFaixas <= 0) {
-                System.out.println("Por favor, informe um número maior que zero.");
+            if (nSongs <= 0) {
+                System.out.println("Please type a number greater than 0.");
             }
-        } while (nFaixas <= 0);
+        } while (nSongs <= 0);
 
-        for (int i = 1; i <= nFaixas; i++) {
-            System.out.printf("---- Faixa %d/%d ----%n", i, nFaixas);
+        for (int i = 1; i <= nSongs; i++) {
+            System.out.printf("---- Song %d/%d ----%n", i, nSongs);
 
-            System.out.print("Nome da música: ");
-            String nomeMusica = scanner.nextLine().trim();
+            System.out.print("Song name: ");
+            String SongName = scanner.nextLine().trim();
 
-            System.out.print("Editora: ");
-            String editora = scanner.nextLine().trim();
+            System.out.print("Publisher: ");
+            String publisher = scanner.nextLine().trim();
 
-            System.out.print("Letra (ou breve resumo): ");
-            String letra = scanner.nextLine().trim();
+            System.out.print("Lyrics: ");
+            String lyrics = scanner.nextLine().trim();
 
-            System.out.print("Notas musicais: ");
+            System.out.print("Musical Notes: ");
             String musicalNotes = scanner.nextLine().trim();
 
-            System.out.print("Género musical da faixa: ");
-            String generoMusica = scanner.nextLine().trim();
+            System.out.print("The song's genre: ");
+            String musicGenre = scanner.nextLine().trim();
 
-            int duracao;
+            int duration;
             do {
-                System.out.print("Duração (segundos): ");
+                System.out.print("Duration (seconds): ");
                 try {
-                    duracao = Integer.parseInt(scanner.nextLine().trim());
+                    duration = Integer.parseInt(scanner.nextLine().trim());
                 } catch (NumberFormatException e) {
-                    duracao = 0;
+                    duration = 0;
                 }
-                if (duracao <= 0) {
-                    System.out.println("Por favor, informe um valor positivo.");
+                if (duration <= 0) {
+                    System.out.println("Please type a number greater than 0.");
                 }
-            } while (duracao <= 0);
+            } while (duration <= 0);
 
-            album.addSong(nomeMusica, editora, letra, musicalNotes, generoMusica, duracao);
-            System.out.println("Faixa adicionada!");
+            System.out.print("Is the Song Explicit? (y/n): ");
+            boolean isExplicit = scanner.nextLine().trim().equalsIgnoreCase("y");
+
+            System.out.println("Does this song have a Music Video? (y/n): ");
+            boolean isMultimedia = scanner.nextLine().trim().equalsIgnoreCase("y");
+            String videoLink = "";
+            if (isMultimedia) {
+                System.out.println("Type the link for the music video:");
+                videoLink = scanner.nextLine().trim();
+            }
+            album.addSong(SongName, publisher, lyrics, musicalNotes, musicGenre, duration, isExplicit, isMultimedia, videoLink);
+            System.out.println("Song added to album successfully!");
         }
 
         try {
             album.setCurrentSong();
-            this.modelData.adicionaAlbum(album);
-            System.out.println("Álbum criado com sucesso!");
-        } catch (JaExisteException e) {
-            System.out.println("Erro: álbum já existe. Tente novamente com outro título.");
+            this.modelData.addAlbum(album);
+            System.out.println("Album created successfully!");
+        } catch (AlreadyExistsException e) {
+            System.out.println("Error. An album with that title already exists." + e.getMessage());
         }
     }
 
     public void deleteAlbum() {
         System.out.println("Admin: Delete Album");
         System.out.print("Title of the album to delete: ");
-        String titulo = scanner.nextLine().trim();
+        String title = scanner.nextLine().trim();
 
-        while (!modelData.existeAlbum(titulo)) {
+        while (!modelData.existsAlbum(title)) {
             System.out.print("Album not found. Enter another title (or 'exit' to cancel): ");
-            titulo = scanner.nextLine().trim();
-            if (titulo.equalsIgnoreCase("exit")) {
+            title = scanner.nextLine().trim();
+            if (title.equalsIgnoreCase("exit")) {
                 System.out.println("Operation canceled.");
                 return;
             }
         }
 
-        System.out.printf("Are you sure you want to delete the album '%s'? (y/n): ", titulo);
-        String confirma = scanner.nextLine().trim();
-        if (!confirma.equalsIgnoreCase("y")) {
+        System.out.printf("Are you sure you want to delete the album '%s'? (y/n): ", title);
+        String confirm = scanner.nextLine().trim();
+        if (!confirm.equalsIgnoreCase("y")) {
             System.out.println("Operation Cancelled.");
             return;
         }
 
         try {
-            modelData.removeAlbum(titulo);
+            modelData.removeAlbum(title);
             System.out.println("Album deleted successfully.");
-        } catch (NaoExisteException e) {
+        } catch (DoesntExistException e) {
             System.out.println("Error album not found.");
         }
     }
 
     public void createPlaylistAdmin() {
         System.out.println("Admin: Create Playlist");
-        scanner.nextLine(); 
+        scanner.nextLine();
 
         User playlistOwner = null;
         System.out.print("Enter username of the playlist owner (leave blank for a general/system playlist): ");
@@ -402,7 +424,7 @@ public class AdminUI {
         if (!ownerUsername.isEmpty()) {
             try {
                 playlistOwner = modelData.getUser(ownerUsername);
-            } catch (NaoExisteException e) {
+            } catch (DoesntExistException e) {
                 System.out.println("User '" + ownerUsername + "' not found. Playlist will be general if you proceed without a valid owner.");
             }
         }
@@ -411,40 +433,39 @@ public class AdminUI {
         System.out.println("Enter the name for the new playlist: ");
         String nomePlaylist = scanner.nextLine().trim();
 
-        while (this.modelData.existePlaylist(nomePlaylist)) {
+        while (this.modelData.existsPlaylist(nomePlaylist)) {
             System.out.println("A playlist with this name already exists. Please choose another name: ");
             nomePlaylist = scanner.nextLine().trim();
         }
-        System.out.println("Indique descrição da playlist: ");
-        String descricaoPlaylist = scanner.nextLine().trim();
+        System.out.println("Give the playlist a description:");
+        String playlistDescription = scanner.nextLine().trim();
         String estado;
         do {
             System.out.println("Estado (private ou public):");
             estado = scanner.nextLine().trim();
             if (!estado.equalsIgnoreCase("private")
                     && !estado.equalsIgnoreCase("public")) {
-                System.out.println("Opção inválida! Digite apenas 'private' ou 'public'.");
+                System.out.println("Invalid Option! Write only 'private' ou 'public'.");
             }
         } while (!estado.equalsIgnoreCase("private")
                 && !estado.equalsIgnoreCase("public"));
         int n;
         System.out.println("How many songs to add initially?: ");
-        // Input validation for integer
         while (!scanner.hasNextInt()) {
             System.out.println("That's not a valid number. Please enter an integer:");
-            scanner.next(); // consume the invalid input
+            scanner.next();
         }
         n = scanner.nextInt();
-        scanner.nextLine(); // Consume the leftover newline
+        scanner.nextLine();
 
         while (n <= 0) {
             System.out.println("Type a number greater than 0: ");
             while (!scanner.hasNextInt()) {
                 System.out.println("That's not a valid number. Please enter an integer:");
-                scanner.next(); // consume the invalid input
+                scanner.next();
             }
             n = scanner.nextInt();
-            scanner.nextLine(); // Consume the leftover newline
+            scanner.nextLine();
         }
 
         while (n > 0) {
@@ -455,59 +476,59 @@ public class AdminUI {
                 try {
                     Album album = this.modelData.getAlbum(nomeAlbum);
                     System.out.println("Songs in album '" + album.getTitle() + "':");
-                    album.getSongsCopy().forEach(song -> System.out.println("- " + song.getName())); // Use getTitulo
+                    album.getSongsCopy().forEach(song -> System.out.println("- " + song.getName()));
                     while (true) {
                         System.out.println("Type the name of the song you want to add to the playlist: ");
-                        String nomeMusica = scanner.nextLine().trim();
+                        String musicName = scanner.nextLine().trim();
                         try {
-                            songs.add(this.modelData.getSong(nomeMusica, nomeAlbum));
-                            System.out.println("Song '" + nomeMusica + "' added to playlist");
+                            songs.add(this.modelData.getSong(musicName, nomeAlbum));
+                            System.out.println("Song '" + musicName + "' added to playlist");
                             break;
-                        } catch (NaoExisteException e) {
+                        } catch (DoesntExistException e) {
                             System.out.println("Incorrect song name, does not exist in album '" + nomeAlbum + "'. Try again.");
                         }
                     }
                     break;
 
-                } catch (NaoExisteException e) {
+                } catch (DoesntExistException e) {
                     System.out.println("Incorrect album name, does not exist. Try again.");
                 }
             }
             n--;
         }
 
-        Playlist playlist = new Playlist(playlistOwner, nomePlaylist, descricaoPlaylist, 0, estado, songs);
+        Playlist playlist = new Playlist(playlistOwner, nomePlaylist, playlistDescription, 0, estado, songs);
         try {
             this.modelData.addPlaylist(playlist);
             System.out.println("Playlist '" + nomePlaylist + "' created successfully!");
-        } catch (JaExisteException e) {
-            System.out.println("Error: A playlist with that name already exists."); // Should have been caught by existePlaylist check
+        } catch (AlreadyExistsException e) {
+            System.out.println("Error: A playlist with that name already exists.");
         }
     }
 
 
     public void deletePlaylistAdmin() {
         System.out.println("Admin: Delete Playlist");
-        scanner.nextLine(); 
+        scanner.nextLine();
         System.out.print("Enter the name of the playlist to delete: ");
         String nome = scanner.nextLine().trim();
 
-        if (!modelData.existePlaylist(nome)) {
+        if (!modelData.existsPlaylist(nome)) {
             System.out.println("Playlist not found.");
             return;
         }
 
         System.out.printf("Are you sure you want to delete the playlist '%s'? (y/n): ", nome);
-        String confirma = scanner.nextLine().trim();
-        if (!confirma.equalsIgnoreCase("y")) {
+        String confirm = scanner.nextLine().trim();
+        if (!confirm.equalsIgnoreCase("y")) {
             System.out.println("Operation cancelled.");
             return;
         }
 
         try {
-            modelData.removePlaylist(nome); 
+            modelData.removePlaylist(nome);
             System.out.println("Playlist '" + nome + "' deleted successfully!");
-        } catch (NaoExisteException e) {
+        } catch (DoesntExistException e) {
             System.out.println("Error: Playlist not found during deletion attempt.");
         }
     }
@@ -522,8 +543,8 @@ public class AdminUI {
         }
 
         for (Album album : albums.values()) {
-            System.out.println(album.toString()); 
-            System.out.println("----------------------------------------"); 
+            System.out.println(album.toString());
+            System.out.println("----------------------------------------");
         }
         System.out.println(albums.size() + " album(s) listed.");
     }
@@ -539,7 +560,7 @@ public class AdminUI {
 
         for (Playlist playlist : playlists.values()) {
             System.out.println(playlist.toString());
-            System.out.println("----------------------------------------"); 
+            System.out.println("----------------------------------------");
         }
         System.out.println(playlists.size() + " playlist(s) listed.");
 
@@ -551,15 +572,13 @@ public class AdminUI {
 
         if (users.isEmpty()) {
             System.out.println("No users found in the system.");
-            System.out.println("\nPress Enter to return to the User Management Menu...");
-            scanner.nextLine();
             return;
         }
 
         for (User user : users.values()) {
             // Assuming User class has a meaningful toString() method
-            System.out.println(user.toString()); 
-            System.out.println("----------------------------------------"); 
+            System.out.println(user.toString());
+            System.out.println("----------------------------------------");
         }
         System.out.println(users.size() + " user(s) listed.");
     }
@@ -570,7 +589,7 @@ public class AdminUI {
         System.out.print("Enter the username of the user to delete: ");
         String username = scanner.nextLine().trim();
 
-        while (!modelData.existeUser(username)) {
+        while (!modelData.existsUser(username)) {
             System.out.print("User not found. Enter another username (or 'exit' to cancel): ");
             username = scanner.nextLine().trim();
             if (username.equalsIgnoreCase("exit")) {
@@ -580,8 +599,8 @@ public class AdminUI {
         }
 
         System.out.printf("Are you sure you want to delete the user '%s'? This action cannot be undone. (y/n): ", username);
-        String confirma = scanner.nextLine().trim();
-        if (!confirma.equalsIgnoreCase("y")) {
+        String confirm = scanner.nextLine().trim();
+        if (!confirm.equalsIgnoreCase("y")) {
             System.out.println("Operation Cancelled.");
             return;
         }
@@ -589,10 +608,7 @@ public class AdminUI {
         try {
             modelData.removeUser(username);
             System.out.println("User '" + username + "' deleted successfully.");
-            //  Future consideration: also delete playlists created by this user? Or reassign them?
-            //  For now, playlists will remain but might be orphaned if they were user-specific and private.
-        } catch (NaoExisteException e) {
-            // This should not happen due to the check above, but as a safeguard:
+        } catch (DoesntExistException e) {
             System.out.println("Error: User not found during deletion attempt.");
         }
     }

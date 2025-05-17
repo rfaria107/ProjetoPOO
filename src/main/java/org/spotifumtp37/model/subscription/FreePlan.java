@@ -20,7 +20,7 @@ public class FreePlan implements SubscriptionPlan, Serializable {
     }
 
     @Override
-    public boolean canAcessFavouritesList() {
+    public boolean canAccessFavouritesList() {
         return false;
     }
 }

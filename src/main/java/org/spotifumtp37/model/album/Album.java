@@ -1,5 +1,6 @@
 package org.spotifumtp37.model.album;
 
+import org.spotifumtp37.model.exceptions.SubscriptionDoesNotAllowException;
 import org.spotifumtp37.model.playlist.Playable;
 import org.spotifumtp37.model.user.User;
 
@@ -67,7 +68,8 @@ public class Album implements Playable, Serializable {
         return copy;
     }
 
-    public void addSong(String name, String publisher, String lyrics, String musicalNotes, String genre, int durationInSeconds) {
+    public void addSong(String name, String publisher, String lyrics, String musicalNotes, String genre,
+                        int durationInSeconds, boolean isExplicit, boolean isMultimedia, String videoLink) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Song name cannot be null or empty.");
         }
@@ -78,7 +80,13 @@ public class Album implements Playable, Serializable {
             throw new IllegalArgumentException("A song with the same name already exists in the album.");
         }
 
-        Song song = new Song(name, this.artist, publisher, lyrics, musicalNotes, genre, durationInSeconds);
+        Song song;
+        if (isExplicit) {
+            song = new ExplicitSong(name, this.artist, publisher, lyrics, musicalNotes, genre, durationInSeconds);
+        } else if (isMultimedia) {
+            song = new MultimediaSong(name, this.artist, publisher, lyrics, musicalNotes, genre, durationInSeconds, videoLink);
+        } else
+            song = new Song(name, this.artist, publisher, lyrics, musicalNotes, genre, durationInSeconds);
         songs.add(song);
     }
 
@@ -104,7 +112,7 @@ public class Album implements Playable, Serializable {
         return title;
     }
 
-    public void setCurrentSong(){
+    public void setCurrentSong() {
         Random rand = new Random();
         int randomIndex = rand.nextInt(songs.size() - 1);
         this.currentSong = songs.get(randomIndex);
@@ -152,31 +160,38 @@ public class Album implements Playable, Serializable {
 
     @Override
     public void next(User user) {
+
         if (user.getSubscriptionPlan().canBrowsePlaylist()) {
-            currentSong = songs.get((songs.indexOf(currentSong) + 1) % songs.size());
+            int index = songs.indexOf(currentSong);
+            int nextIndex = (index + 1) % songs.size();
+            currentSong = songs.get(nextIndex);
         } else {
+            if (songs.size() == 1) return;
             Random rand = new Random();
-            int randomIndex = rand.nextInt(songs.size() - 1);
-            while (randomIndex == songs.indexOf(currentSong)) {
-                randomIndex = rand.nextInt(songs.size() - 1);
-            }
+            int currentIndex = songs.indexOf(currentSong);
+            int randomIndex;
+            do {
+                randomIndex = rand.nextInt(songs.size());
+            } while (randomIndex == currentIndex);
             currentSong = songs.get(randomIndex);
         }
     }
 
     @Override
-    public void previous(User user) {
+    public void previous(User user) throws SubscriptionDoesNotAllowException {
         if (user.getSubscriptionPlan().canBrowsePlaylist()) {
-            currentSong = songs.get((songs.indexOf(currentSong) - 1 + songs.size() - 1) % songs.size() - 1);
+            int index = songs.indexOf(currentSong);
+            int prevIndex = (index - 1 + songs.size()) % songs.size();
+            currentSong = songs.get(prevIndex);
         } else {
-            throw new UnsupportedOperationException("Your subscription does not allow going back in the playlist.");
+            throw new SubscriptionDoesNotAllowException("Your subscription does not allow going back in the playlist.");
         }
     }
 
     @Override
     public void play(User user) {
         this.currentSong.incrementTimesPlayed();
-        user.somarPontos();
+        user.addPoints();
         user.updateHistory(this.currentSong);
     }
 
