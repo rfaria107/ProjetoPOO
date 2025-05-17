@@ -5,9 +5,9 @@ import java.io.Serializable;
 public class ExplicitSong extends Song implements Serializable {
     private final boolean explicit;
 
-    ExplicitSong(Song other) {
+    ExplicitSong(ExplicitSong other) {
         super(other);
-        this.explicit = true;
+        this.explicit = other.isExplicit();
     }
 
     ExplicitSong(String name, String artist, String publisher, String lyrics, String musicalNotes, String genre, int durationInSeconds) {
@@ -23,5 +23,15 @@ public class ExplicitSong extends Song implements Serializable {
         return false;
     }
 
+    @Override
+    public ExplicitSong clone() {
+        return new ExplicitSong(this);
+    }
 
+    @Override
+    public String toString() {
+        return super.toString() +
+                "explicit=" + explicit +
+                '}';
+    }
 }

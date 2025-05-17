@@ -31,12 +31,12 @@ public class PlayerUI {
             Song song = playable.getCurrentSong();
             System.out.printf("Now playing \"%s\" by %s%n", song.getName(), song.getArtist());
             if (song.isExplicit()) {
-                System.out.println("Warning: This is an explicit song!");
+                System.out.println("Attention! This is an explicit song!");
             }
 
             if (song.isMultimedia()) {
                 System.out.println("This song has a music video!");
-                System.out.println("You can watch it at" + ((MultimediaSong) song).getVideoLink());
+                System.out.println("You can watch it at " + ((MultimediaSong) song).getVideoLink());
             }
 
             System.out.println("Lyrics:\n" + song.getLyrics());
@@ -45,7 +45,7 @@ public class PlayerUI {
             if (user.getSubscriptionPlan().canBrowsePlaylist()) {
                 System.out.print("p=prev, ");
             }
-            System.out.print("s=stop");
+            System.out.print("s=stop\n");
             boolean waitingForInput = true;
             while (waitingForInput) {
                 System.out.print("Command: ");

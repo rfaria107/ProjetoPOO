@@ -6,11 +6,12 @@ public class MultimediaSong extends Song implements Serializable {
     private final boolean multimedia;
     private String videoLink;
 
-    MultimediaSong(Song other) {
+    public MultimediaSong(MultimediaSong other) {
         super(other);
         this.multimedia = true;
-        this.videoLink = "";
+        this.videoLink = other.videoLink;
     }
+
 
     public String getVideoLink() {
         return videoLink;
@@ -28,5 +29,18 @@ public class MultimediaSong extends Song implements Serializable {
 
     public boolean isMultimedia() {
         return multimedia;
+    }
+
+    @Override
+    public MultimediaSong clone() {
+        return new MultimediaSong(this);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+                "multimedia=" + multimedia +
+                ", videoLink='" + videoLink + '\'' +
+                '}';
     }
 }

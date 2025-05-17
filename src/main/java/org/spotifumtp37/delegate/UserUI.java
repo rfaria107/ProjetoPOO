@@ -129,8 +129,8 @@ public class UserUI {
     }
 
     private void playFromSpecificAlbum() {
+        scanner.nextLine();
         System.out.println("Enter the name of the album to play: ");
-        scanner.nextLine(); // Consume leftover newline
         String albumName = scanner.nextLine().trim();
         try {
             Album album = modelData.getAlbum(albumName);

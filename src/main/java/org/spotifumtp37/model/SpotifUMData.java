@@ -91,11 +91,11 @@ public class SpotifUMData implements Serializable {
     }
 
     public void setMapAlbums(Map<String, Album> mapAlbums) {
-        Map<String, Album> newMapCarros = new HashMap<>();
+        Map<String, Album> newMapAlbums = new HashMap<>();
         for (Map.Entry<String, Album> entry : mapAlbums.entrySet()) {
-            newMapCarros.put(entry.getKey(), entry.getValue().clone());
+            newMapAlbums.put(entry.getKey(), entry.getValue().clone());
         }
-        this.albums = newMapCarros;
+        this.albums = newMapAlbums;
     }
 
     public void setMapUsers(Map<String, User> mapUsers) {

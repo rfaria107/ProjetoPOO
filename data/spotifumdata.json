@@ -10,7 +10,7 @@
           "name": "Speak to Me",
           "artist": "Pink Floyd",
           "publisher": "Pink Floyd Records",
-          "lyrics": "Lyrics for Speak to Me...",
+          "lyrics": "Speak to me has no lyrics",
           "musicalNotes": "C G Am F",
           "genre": "Progressive Rock",
           "durationInSeconds": 351,
@@ -22,7 +22,7 @@
           "name": "Breathe",
           "artist": "Pink Floyd",
           "publisher": "Pink Floyd Records",
-          "lyrics": "Lyrics for Breathe...",
+          "lyrics": "Breathe, breathe in the air\nDon't be afraid to care\nLeave, but don't leave me\nLook around\nAnd choose your own ground\n\nFor long you live and high you fly\nAnd smiles you'll give and tears you'll cry\nAnd all you touch and all you see\nIs all your life will ever be\n\nRun, rabbit, run\nDig that hole, forget the Sun\nAnd when at last the work is done\nDon't sit down, it's time to dig another one\n\nFor long you live and high you fly\nBut only if you ride the tide\nAnd balanced on the biggest wave\nYou race towards an early grave",
           "musicalNotes": "C G Am F",
           "genre": "Progressive Rock",
           "durationInSeconds": 297,
@@ -41,14 +41,14 @@
         }
       ],
       "currentSong": {
-        "name": "Speak to Me",
+        "name": "Time",
         "artist": "Pink Floyd",
         "publisher": "Pink Floyd Records",
-        "lyrics": "Lyrics for Speak to Me...",
+        "lyrics": "Lyrics for Time...",
         "musicalNotes": "C G Am F",
         "genre": "Progressive Rock",
-        "durationInSeconds": 351,
-        "timesPlayed": 8
+        "durationInSeconds": 254,
+        "timesPlayed": 4
       }
     },
     "Illmatic": {

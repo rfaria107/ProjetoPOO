@@ -63,7 +63,7 @@ public class Album implements Playable, Serializable {
     public List<Song> copySongs(List<Song> songs) {
         List<Song> copy = new ArrayList<>();
         for (Song song : songs) {
-            copy.add(new Song(song));
+            copy.add(song.clone());
         }
         return copy;
     }
@@ -98,7 +98,7 @@ public class Album implements Playable, Serializable {
     public List<Song> getSongsCopy() {
         List<Song> copy = new ArrayList<>();
         for (Song song : this.songs) {
-            copy.add(new Song(song));
+            copy.add(song.clone());
         }
         return copy;
     }
