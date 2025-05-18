@@ -48,9 +48,9 @@ public class SpotifUMUI {
 
     public void loginAsUser() {
         System.out.print("Input your username:");
-        String username = scanner.next();
+        String username = scanner.nextLine();
         System.out.print("Input your password:");
-        String password = scanner.next();
+        String password = scanner.nextLine();
 
         boolean isAuthenticated = this.authenticateUser(username, password);
         if (isAuthenticated) {
@@ -66,19 +66,19 @@ public class SpotifUMUI {
     public void signUpAsUser() {
         System.out.println("Sign Up as a New User!");
         System.out.print("Enter your desired username: ");
-        String username = scanner.next();
+        String username = scanner.nextLine();
 
         System.out.print("Enter your desired password: ");
-        String password = scanner.next();
+        String password = scanner.nextLine();
 
         System.out.print("Confirm your password: ");
-        String confirmPassword = scanner.next();
+        String confirmPassword = scanner.nextLine();
 
         System.out.print("Enter your email address: ");
-        String email = scanner.next();
+        String email = scanner.nextLine();
 
         System.out.print("Enter your address: ");
-        String address = scanner.next();
+        String address = scanner.nextLine();
 
         // Verify that the user confirmed the password correctly
         if (!password.equals(confirmPassword)) {
@@ -108,9 +108,9 @@ public class SpotifUMUI {
 
     public void loginAsAdmin() {
         System.out.print("Input admin username: ");
-        String username = scanner.next();
+        String username = scanner.nextLine();
         System.out.print("Input admin password: ");
-        String password = scanner.next();
+        String password = scanner.nextLine();
 
         if (username.equals("admin123") && password.equals("pass123")) {
             System.out.println("Login successful! Redirecting to Admin Menu...");
