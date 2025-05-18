@@ -1,9 +1,8 @@
 package org.spotifumtp37.delegate;
 
-import org.spotifumtp37.model.SpotifUMData;
 import org.spotifumtp37.model.album.MultimediaSong;
 import org.spotifumtp37.model.album.Song;
-import org.spotifumtp37.model.exceptions.SubscriptionDoesNotAllowException;
+import org.spotifumtp37.exceptions.SubscriptionDoesNotAllowException;
 import org.spotifumtp37.model.playlist.Playable;
 import org.spotifumtp37.model.user.User;
 

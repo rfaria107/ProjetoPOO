@@ -1,8 +1,8 @@
 package org.spotifumtp37.delegate;
 
 import org.spotifumtp37.model.SpotifUMData;
-import org.spotifumtp37.model.exceptions.AlreadyExistsException;
-import org.spotifumtp37.model.exceptions.DoesntExistException;
+import org.spotifumtp37.exceptions.AlreadyExistsException;
+import org.spotifumtp37.exceptions.DoesntExistException;
 import org.spotifumtp37.model.subscription.FreePlan;
 import org.spotifumtp37.model.user.User;
 
@@ -107,8 +107,17 @@ public class SpotifUMUI {
     }
 
     public void loginAsAdmin() {
-        System.out.println("Redirecting to Admin Menu...");
-        adminUI.showAdminMenu();
+        System.out.print("Input admin username: ");
+        String username = scanner.next();
+        System.out.print("Input admin password: ");
+        String password = scanner.next();
+
+        if (username.equals("admin123") && password.equals("pass123")) {
+            System.out.println("Login successful! Redirecting to Admin Menu...");
+            adminUI.showAdminMenu();
+        } else {
+            System.out.println("Invalid admin credentials!");
+        }
     }
 
     public boolean authenticateUser(String username, String password) {

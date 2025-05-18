@@ -1,6 +1,6 @@
 package org.spotifumtp37.model.album;
 
-import org.spotifumtp37.model.exceptions.SubscriptionDoesNotAllowException;
+import org.spotifumtp37.exceptions.SubscriptionDoesNotAllowException;
 import org.spotifumtp37.model.playlist.Playable;
 import org.spotifumtp37.model.user.User;
 

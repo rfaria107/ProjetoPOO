@@ -2,7 +2,7 @@ package org.spotifumtp37.model.album;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.spotifumtp37.model.exceptions.SubscriptionDoesNotAllowException;
+import org.spotifumtp37.exceptions.SubscriptionDoesNotAllowException;
 import org.spotifumtp37.model.subscription.FreePlan;
 import org.spotifumtp37.model.subscription.PremiumBase;
 import org.spotifumtp37.model.user.User;

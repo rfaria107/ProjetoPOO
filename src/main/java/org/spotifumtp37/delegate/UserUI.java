@@ -3,9 +3,9 @@ package org.spotifumtp37.delegate;
 import org.spotifumtp37.model.SpotifUMData;
 import org.spotifumtp37.model.album.Album;
 import org.spotifumtp37.model.album.Song;
-import org.spotifumtp37.model.exceptions.AlreadyExistsException;
-import org.spotifumtp37.model.exceptions.DoesntExistException;
-import org.spotifumtp37.model.exceptions.SubscriptionDoesNotAllowException;
+import org.spotifumtp37.exceptions.AlreadyExistsException;
+import org.spotifumtp37.exceptions.DoesntExistException;
+import org.spotifumtp37.exceptions.SubscriptionDoesNotAllowException;
 import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.subscription.FreePlan;
 import org.spotifumtp37.model.subscription.PremiumBase;
@@ -352,10 +352,9 @@ public class UserUI {
 
     public void createPlaylist() {
         List<Song> songs = new ArrayList<>();
-
+        scanner.nextLine();
         System.out.println("Create New Playlist");
         String playlistName;
-        scanner.nextLine();
         System.out.println("Enter the name for your new playlist: ");
         playlistName = scanner.nextLine().trim();
 
@@ -513,8 +512,8 @@ public class UserUI {
 
     public void deletePlaylist() {
         System.out.println("Deleting Playlist");
+        scanner.nextLine();
         System.out.print("Enter the name of the playlist to delete: ");
-        scanner.nextLine(); // consume leftover newline
         String name = scanner.nextLine().trim();
 
         if (!modelData.existsPlaylist(name)) {
@@ -522,7 +521,7 @@ public class UserUI {
             return;
         }
         try {
-            Playlist playlistToDelete = this.modelData.getPlaylist(name); // Assuming this gets any playlist by name
+            Playlist playlistToDelete = this.modelData.getPlaylist(name);
             if (!playlistToDelete.getCreator().equals(this.loggedUser)) {
                 System.out.println("Error: You can only delete your own playlists.");
                 return;

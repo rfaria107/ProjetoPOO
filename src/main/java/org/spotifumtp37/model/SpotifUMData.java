@@ -1,8 +1,8 @@
 package org.spotifumtp37.model;
 
 import org.spotifumtp37.model.album.*;
-import org.spotifumtp37.model.exceptions.AlreadyExistsException;
-import org.spotifumtp37.model.exceptions.DoesntExistException;
+import org.spotifumtp37.exceptions.AlreadyExistsException;
+import org.spotifumtp37.exceptions.DoesntExistException;
 import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.user.*;
 
@@ -161,7 +161,7 @@ public class SpotifUMData implements Serializable {
     }
 
     public Playlist getPlaylist(String playlistName) throws DoesntExistException {
-        if (!existsPlaylist(playlistName) || playlists.get(playlistName).isPrivate()) {
+        if (!existsPlaylist(playlistName)) {
             throw new DoesntExistException(playlistName);
         } else {
             return playlists.get(playlistName);

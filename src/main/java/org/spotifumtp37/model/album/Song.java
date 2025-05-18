@@ -13,7 +13,7 @@ public class Song implements Serializable {
     private int durationInSeconds;
     private int timesPlayed;
 
-    Song() {
+    public Song() {
         this.name = "";
         this.artist = "";
         this.publisher = "";
@@ -36,7 +36,7 @@ public class Song implements Serializable {
         this.timesPlayed = 0;
     }
 
-    Song(Song other) {
+    public Song(Song other) {
         this.name = other.getName();
         this.artist = other.getArtist();
         this.publisher = other.getPublisher();

@@ -3,8 +3,8 @@ package org.spotifumtp37.delegate;
 import org.spotifumtp37.model.SpotifUMData;
 import org.spotifumtp37.model.album.Album;
 import org.spotifumtp37.model.album.Song;
-import org.spotifumtp37.model.exceptions.AlreadyExistsException;
-import org.spotifumtp37.model.exceptions.DoesntExistException;
+import org.spotifumtp37.exceptions.AlreadyExistsException;
+import org.spotifumtp37.exceptions.DoesntExistException;
 import org.spotifumtp37.model.playlist.Playlist;
 import org.spotifumtp37.model.user.User;
 import org.spotifumtp37.util.JsonDataParser;
@@ -364,9 +364,11 @@ public class AdminUI {
 
             System.out.print("Is the Song Explicit? (y/n): ");
             boolean isExplicit = scanner.nextLine().trim().equalsIgnoreCase("y");
-
-            System.out.println("Does this song have a Music Video? (y/n): ");
-            boolean isMultimedia = scanner.nextLine().trim().equalsIgnoreCase("y");
+            boolean isMultimedia = false;
+            if (!isExplicit) {
+                System.out.println("Does this song have a Music Video? (y/n): ");
+                isMultimedia = scanner.nextLine().trim().equalsIgnoreCase("y");
+            }
             String videoLink = "";
             if (isMultimedia) {
                 System.out.println("Type the link for the music video:");
@@ -508,8 +510,8 @@ public class AdminUI {
 
 
     public void deletePlaylistAdmin() {
-        System.out.println("Admin: Delete Playlist");
         scanner.nextLine();
+        System.out.println("Admin: Delete Playlist");
         System.out.print("Enter the name of the playlist to delete: ");
         String nome = scanner.nextLine().trim();
 

@@ -1,4 +1,4 @@
-package org.spotifumtp37.model.exceptions;
+package org.spotifumtp37.exceptions;
 
 public class DoesntExistException extends Exception {
     public DoesntExistException(String message) {
