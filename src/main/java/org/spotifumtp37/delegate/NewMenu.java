@@ -36,7 +36,7 @@ public class NewMenu {
     }
 
     /** Functional interface para pré-condições. */
-    /** Podia ser utilizado Predicate<T> */
+    /** Podia ser utilizado Predicate&lt;T&gt; */
     public interface PreCondition {
         public boolean validate();
     }
