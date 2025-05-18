@@ -3,6 +3,7 @@
 - Dinis Costa
 - Rita Cunha
 - Rui Faria
-## Para correr o projeto: ./gradlew run
-## Para correr os testes: ./gradlew test
-## Para gerar a documentação ./gradlew javadoc
+### O relatório e diagrama de classes encontram-se na pasta "Report"
+### Para correr o projeto: ./gradlew run
+### Para correr os testes: ./gradlew test
+### Para gerar a documentação ./gradlew javadoc
