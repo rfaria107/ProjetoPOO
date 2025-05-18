@@ -170,7 +170,7 @@ public class Album implements Playable, Serializable {
      */
     public void setCurrentSong() {
         Random rand = new Random();
-        int randomIndex = rand.nextInt(songs.size() - 1);
+        int randomIndex = rand.nextInt(songs.size());
         this.currentSong = songs.get(randomIndex);
     }
 
