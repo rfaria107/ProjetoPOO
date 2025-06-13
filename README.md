@@ -3,18 +3,15 @@
 🎓 **Unidade Curricular:** Programação Orientada aos Objetos 
 📊 **Classificação obtida:** 18 valores
 
----
 
 ## 👥 Autores:
 - **Dinis Costa**
 - **Rita Cunha**
 - **Rui Faria**
 
----
 
-## O relatório e diagrama de classes encontram-se na pasta [`Report`](./Report)"
+## O relatório e diagrama de classes encontram-se na pasta [`Report`](./Report)
 
----
 
 ## Como correr o projeto
 
