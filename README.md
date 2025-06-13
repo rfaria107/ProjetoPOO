@@ -33,7 +33,7 @@
 ./gradlew javadoc
 ```
 
-🎯 Sobre o projeto
+## 🎯 Sobre o projeto
 
 O SpotifUM é uma aplicação de streaming musical que simula uma plataforma realista, permitindo:
 
